@@ -46,54 +46,6 @@ body{
     color: #333;
 }
 
-
-.right-panel input[type="text"],
-.right-panel input[type="password"],
-.right-panel select {
-    width: 100%;
-    padding: 13px 15px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-.right-panel button {
-    background-color:#073f7b;
-    color: white;
-    border: none;
-    width: 100%;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-.right-panel button:hover {
-    background-color: #4095f1;
-}
-.logo{
-    height: 120px;
-    width: auto;
-    margin-top: 10px;
-    display: flex;
-    align-items: center;
-    margin: 0 auto 20px;
-}
-.admin-container button{
-    padding: 10px 20px;
-    background-color:#073f7b;
-    color: white;
-    border-radius: 20px;
-    margin-top: 40px;
-    font-weight: bold;
-    
-    font-size: 11px;
-    display: inline-block;
-}
-.admin-container button:hover{
-    background-color:#4d647c;
-}
-
 /* INPUT GROUPS WITH ICONS */
 .input-group {
     position: relative;
@@ -108,25 +60,31 @@ body{
     color: #073f7b;
     font-size: 16px;
     z-index: 5;
-    pointer-events: none;
 }
 
-.input-group input {
+.input-group input,
+.input-group select {
     width: 100%;
-    padding: 13px 45px 13px 15px;
+    padding: 13px 15px 13px 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
     font-size: 14px;
 }
 
-.input-group input:focus {
+.input-group input:focus,
+.input-group select:focus {
     outline: none;
     border-color: #073f7b;
     box-shadow: 0 0 5px rgba(7, 63, 123, 0.3);
 }
 
-/* EYE ICON - CLICKABLE */
+/* NO ICON FOR TERM */
+.input-group.no-icon i {
+    display: none;
+}
+
+/* EYE ICON - TOGGLE PASSWORD ON RIGHT */
 #togglePassword {
     position: absolute;
     right: 15px;
@@ -134,13 +92,69 @@ body{
     color: #073f7b;
     z-index: 10;
     font-size: 16px;
-    pointer-events: auto;
 }
 
 #togglePassword:hover {
     color: #4095f1;
 }
 
-.password-group input {
-    padding-right: 45px;
+.right-panel button {
+    background-color:#073f7b;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.right-panel button:hover {
+    background-color: #4095f1;
+}
+
+.right-panel button i {
+    margin-right: 8px;
+}
+
+.logo{
+    height: 120px;
+    width: auto;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    margin: 0 auto 20px;
+}
+
+.admin-container button{
+    padding: 10px 20px;
+    background-color:#073f7b;
+    color: white;
+    border-radius: 20px;
+    margin-top: 40px;
+    font-weight: bold;
+    font-size: 11px;
+    display: inline-block;
+    transition: 0.3s;
+}
+
+.admin-container button:hover{
+    background-color:#4d647c;
+}
+.logo {
+    height: 100px;
+    width: 100px;
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: white;
+}
+
+.logo img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
 }

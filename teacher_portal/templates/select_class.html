@@ -1,64 +1,101 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Select Class and Subject</title>
-    <link rel="stylesheet" href="{{ url_for('static',
-     filename='class_design.css')}}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Class and Subject - Neo-Class</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='class_design.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
-      function filterSubjects() {
-        const selectedClass = document.getElementById('class_id').value;
-        const subjectSelect = document.getElementById('subject_id');
-        const options = subjectSelect.options;
+        function filterSubjects() {
+            const selectedClass = document.getElementById('class_id').value;
+            const subjectSelect = document.getElementById('subject_id');
+            const options = subjectSelect.options;
 
-        for (let i = 0; i < options.length; i++) {
-          const classId = options[i].getAttribute('data-class');
-          options[i].style.display = (classId === selectedClass || options[i].value === "") ? 'block' : 'none';
+            // Reset subject dropdown
+            subjectSelect.value = "";
+
+            // Show/hide options based on selected class
+            for (let i = 0; i < options.length; i++) {
+                const classId = options[i].getAttribute('data-class');
+                if (classId === selectedClass || options[i].value === "") {
+                    options[i].style.display = 'block';
+                } else {
+                    options[i].style.display = 'none';
+                }
+            }
         }
-
-        subjectSelect.value = "";
-      }
     </script>
 </head>
 <body>
-  <div class=" container">
-    <div class="logo">
-    <img src="{{url_for('static',filename='school.png')}}" alt="Logo" class="logo">
-  </div>
-    
-    <h2>Select Class, Subject, and Term</h2>
+    <div class="container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <h2>Neo-Class</h2>
+            <p>Fill in the required fields to proceed.</p>
+        </div>
 
-    <form method="GET" action="/enter_marks">
-        <label for="class_id">Class:</label>
-        <select id="class_id" name="class_id" onchange="filterSubjects()"required>
-            <option value="" disabled selected>Select Class</option>
-            {% for cls in classes %}
-            <option value="{{ cls.id }}">{{ cls.name }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <div class="logo">
+                <img src="{{ url_for('static', filename='funda.png') }}" alt="School Logo">
+            </div>
 
-        <label for="subject_id">Subject:</label>
-        <select id="subject_id" name="subject_id" required>
-            <option value="" disabled selected>Select Subject</option>
-            {% for subject in subjects %}
-            <option value="{{ subject.id }}" data-class="{{ subject.class_id }}">{{ subject.name }}</option>
-            {% endfor %}
-        </select>
-        <br><br>
+            <h2>Select Class, Subject, and Term</h2>
 
-        <label for="term">Term:</label>
-        <select id="term" name="term" required>
-            <option value="" disabled selected>Select Term</option>
-            <option value="Term 1">Term 1</option>
-            <option value="Term 2">Term 2</option>
-            <option value="Term 3">Term 3</option>
-        </select>
-        <br><br>
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div style="margin-bottom: 20px;">
+                        {% for category, message in messages %}
+                            <div style="padding: 12px 16px; margin-bottom: 10px; background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444;">
+                                <i class="fas fa-exclamation-circle"></i> {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
 
-        <button type="submit">Proceed to Enter Marks</button>
-    </form>
- </div>
+            <!-- Form submits to select_class (POST) for validation -->
+            <form method="POST" action="{{ url_for('select_class') }}">
+                <!-- CLASS FIELD -->
+                <label for="class_id">Class:</label>
+                <select id="class_id" name="class_id" onchange="filterSubjects()" required>
+                    <option value="" disabled selected>Select Class</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls.id }}">{{ cls.name }}</option>
+                    {% endfor %}
+                </select>
 
- <h3>NEO-CLASS-FCA</h3>     
+                <!-- SUBJECT FIELD -->
+                <label for="subject_id">Subject:</label>
+                <select id="subject_id" name="subject_id" required>
+                    <option value="" disabled selected>Select Subject</option>
+                    {% for subject in subjects %}
+                    <option value="{{ subject.id }}" data-class="{{ subject.class_id }}">{{ subject.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <!-- TERM FIELD -->
+                <label for="term">Term:</label>
+                <select id="term" name="term" required>
+                    <option value="" disabled selected>Select Term</option>
+                    <option value="Term 1">Term 1</option>
+                    <option value="Term 2">Term 2</option>
+                    <option value="Term 3">Term 3</option>
+                </select>
+
+                <!-- SUBMIT BUTTON -->
+                <button type="submit">Proceed to Enter Marks</button>
+            </form>
+
+            <!-- Logout Link -->
+            <div style="margin-top: 24px; text-align: center;">
+                <a href="{{ url_for('logout') }}" style="color: #64748b; text-decoration: none; font-weight: 600;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

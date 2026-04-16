@@ -1,25 +1,610 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Admin Login</title>
-  <link rel="stylesheet" href="{{url_for('static',
-   filename='style.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neo-Class · Admin</title>
+  <!-- Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ===== WORLD‑CLASS MODERN DESIGN ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #f0f4fa 0%, #e6ecf3 100%);
+      padding: 20px;
+    }
+
+    .container {
+      display: flex;
+      width: 960px;
+      max-width: 100%;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 25px 50px -8px rgba(3, 68, 138, 0.15), 0 0 0 1px rgba(255,255,255,0.6) inset;
+      border-radius: 32px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    /* LEFT PANEL — premium gradient */
+    .left-panel {
+      background: linear-gradient(135deg, #03448a 0%, #0a5bb5 100%);
+      color: white;
+      padding: 48px 36px;
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      isolation: isolate;
+    }
+
+    .left-panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(255,255,255,0.08) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .left-panel h2 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 18px;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    .left-panel p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      margin-bottom: 36px;
+      line-height: 1.5;
+      font-weight: 400;
+    }
+
+    /* SIGN-UP TOGGLE BUTTON — elegant */
+    .btn-signup-toggle {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(255, 255, 255, 0.35);
+      color: white;
+      padding: 14px 28px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .btn-signup-toggle i {
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .btn-signup-toggle:hover {
+      background: white;
+      color: #03448a;
+      border-color: white;
+      box-shadow: 0 12px 24px -6px rgba(0,0,0,0.2);
+      transform: translateY(-2px);
+    }
+    .btn-signup-toggle:hover i {
+      transform: translateX(3px);
+    }
+
+    /* RIGHT PANEL — glassmorphism card */
+    .right-panel {
+      background: rgba(255,255,255,0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 48px 40px;
+      width: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-sizing: border-box;
+      min-height: 620px;
+      border-left: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* LOGO — world‑class presentation */
+   
+
+    .logo-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo {
+    height: 130px;
+    width: 130px;
+    margin: 0 auto 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: white;
+    }
+
+   .logo img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+   }
+
+   
+
+    .logo-text {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(145deg, #03448a, #1a5fb0);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+
+    .right-panel h2 {
+      text-align: center;
+      margin-bottom: 32px;
+      color: #0b2b4a;
+      font-weight: 700;
+      font-size: 1.9rem;
+      letter-spacing: -0.01em;
+    }
+
+    /* INPUT GROUPS — refined */
+    .input-group {
+      position: relative;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-group i {
+      position: absolute;
+      right: 18px;
+      color: #03448a;
+      font-size: 1.1rem;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .input-group .toggle-password-icon {
+      pointer-events: auto;
+      cursor: pointer;
+      opacity: 1;
+    }
+
+    .input-group input,
+    .input-group select {
+      width: 100%;
+      padding: 16px 20px;
+      border: 1.8px solid rgba(3, 68, 138, 0.15);
+      border-radius: 20px;
+      font-size: 1rem;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(4px);
+      transition: all 0.25s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+      color: #0b2b4a;
+      font-weight: 500;
+    }
+
+    .input-group input:focus,
+    .input-group select:focus {
+      outline: none;
+      border-color: #03448a;
+      box-shadow: 0 0 0 4px rgba(3, 68, 138, 0.12), 0 8px 12px -6px rgba(3,68,138,0.2);
+      background: white;
+    }
+
+    .input-group input::placeholder {
+      color: #6b7f94;
+      font-weight: 400;
+    }
+
+    .input-group.no-icon i {
+      display: none;
+    }
+
+    /* BUTTONS — premium */
+    .right-panel button,
+    .left-panel .signup-action-btn {
+      background: linear-gradient(145deg, #03448a, #0a5bb5);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 16px 22px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      box-shadow: 0 12px 20px -8px rgba(3, 68, 138, 0.4);
+      letter-spacing: 0.3px;
+    }
+
+    .right-panel button:hover,
+    .left-panel .signup-action-btn:hover {
+      background: linear-gradient(145deg, #0a5bb5, #1363c2);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 28px -8px rgba(3, 68, 138, 0.5);
+    }
+
+    /* LEFT PANEL SIGN-UP FORM (white inputs) */
+    .left-panel .signup-form-container {
+      width: 100%;
+    }
+
+    .left-panel .signup-title {
+      font-size: 2rem;
+      margin-bottom: 28px;
+      font-weight: 700;
+    }
+
+    .left-panel .input-group {
+      margin-bottom: 20px;
+    }
+
+    .left-panel .input-group input {
+      background: rgba(255, 255, 255, 0.95);
+      border: none;
+      color: #1e293b;
+      padding-right: 50px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      border-radius: 20px;
+    }
+
+    .left-panel .input-group i {
+      color: #03448a;
+      right: 18px;
+    }
+
+    .left-panel .signup-action-btn {
+      background: white;
+      color: #03448a;
+      margin-top: 24px;
+      font-weight: 700;
+      box-shadow: 0 10px 18px -6px rgba(0,0,0,0.2);
+    }
+
+    .left-panel .signup-action-btn:hover {
+      background: #f0f7ff;
+      color: #022b5c;
+    }
+
+    /* SECURITY HINT */
+    .security-hint {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: -6px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* RIGHT PANEL SIDEBAR STYLE (sign-up state) */
+    .sidebar-login-prompt {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .sidebar-login-prompt .icon-large {
+      font-size: 4rem;
+      color: #03448a;
+      margin-bottom: 24px;
+      opacity: 0.75;
+    }
+
+    .sidebar-login-prompt h3 {
+      font-size: 1.9rem;
+      margin-bottom: 12px;
+      color: #0b2b4a;
+      font-weight: 700;
+    }
+
+    .sidebar-login-prompt p {
+      color: #3a5670;
+      margin-bottom: 32px;
+      font-size: 1.1rem;
+    }
+
+    .btn-login-switch {
+      background: transparent;
+      border: 2px solid #03448a;
+      color: #03448a;
+      padding: 16px 28px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.25s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-login-switch:hover {
+      background: #03448a;
+      color: white;
+      box-shadow: 0 10px 20px -5px rgba(3,68,138,0.3);
+    }
+
+    /* UTILITY */
+    .hidden {
+      display: none !important;
+    }
+
+    .left-panel {
+      overflow-y: auto;
+      max-height: 680px;
+    }
+
+    /* scrollbar beauty */
+    .left-panel::-webkit-scrollbar {
+      width: 4px;
+    }
+    .left-panel::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.3);
+      border-radius: 10px;
+    }
+
+    /* Flash messages */
+    .flash-message {
+      padding: 14px 18px;
+      border-radius: 16px;
+      margin-bottom: 20px;
+      text-align: center;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      backdrop-filter: blur(8px);
+    }
+    .flash-success {
+      background: rgba(46, 125, 50, 0.12);
+      color: #1b5e20;
+      border-left: 4px solid #2e7d32;
+    }
+    .flash-error {
+      background: rgba(211, 47, 47, 0.1);
+      color: #b71c1c;
+      border-left: 4px solid #c62828;
+    }
+
+    /* subtle footer */
+    .secure-badge {
+      margin-top: 30px;
+      text-align: center;
+      color: #6f8fae;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* responsiveness */
+    @media (max-width: 720px) {
+      .container { flex-direction: column; border-radius: 28px; }
+      .left-panel, .right-panel { width: 100%; }
+    }
+  </style>
 </head>
 <body>
-  <div class="login-container">
-  <h2>  Welcome Adminstrator:<br>Login To Proceed</h2>
-  <form method="POST">
-    <input type="text" name="username" placeholder="Username" required><br>
-    <input type="password" name="password" placeholder="Password" required><br><br>
-<label for="class_id">Class:</label>
-        <select id="class_id" name="class_id" required>
-            <option value="" disabled selected>Select Class</option>
-            {% for cls in classes %}
-            <option value="{{ cls.id }}">{{ cls.name }}</option>
-            {% endfor %}
-        </select>
-    <button type="submit">Login</button> 
-  </form>
+<div class="container">
+  <!-- LEFT PANEL — dynamic content -->
+  <div class="left-panel" id="leftPanel">
+    <!-- DEFAULT: welcome + sign-up CTA -->
+    <div id="leftDefaultContent">
+      <h2>Welcome to<br>Neo-Class</h2>
+      <p>Unlock advanced analytics.<br>Sign in to continue your journey.</p>
+      <button class="btn-signup-toggle" id="showSignUpBtn">
+        <i class="fas fa-user-plus"></i> Create account
+      </button>
+      <div style="margin-top: 40px; opacity:0.7; font-size:0.9rem;">
+        <i class="fas fa-shield-alt"></i> Enterprise‑grade security
+      </div>
+    </div>
+
+    <!-- SIGN-UP VIEW (left panel form) -->
+    <div id="leftSignUpContent" class="signup-form-container hidden">
+      <div class="signup-title">Get started</div>
+      <form method="POST" action="{{ url_for('admin_signup') }}">
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" required>
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="input-group password-group">
+          <input type="password" name="password" id="signupPassword" placeholder="Password" required>
+          <i class="fas fa-eye toggle-password-icon" id="toggleSignupPassword"></i>
+        </div>
+        <div class="input-group">
+          <input type="text" name="firstname" placeholder="First name" required>
+          <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="input-group">
+          <input type="text" name="surname" placeholder="Surname" required>
+          <i class="fas fa-user-tag"></i>
+        </div>
+        <div class="input-group">
+          <input type="text" name="security_code" placeholder="System security code" required>
+          <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="security-hint">
+          <i class="fas fa-lock"></i> Admin‑provided code required
+        </div>
+        <button type="submit" class="signup-action-btn">
+          <i class="fas fa-check-circle"></i> Register
+        </button>
+      </form>
+    </div>
   </div>
+
+  <!-- RIGHT PANEL — dynamic -->
+  <div class="right-panel" id="rightPanel">
+    <!-- DEFAULT: Admin login (with original funda logo) -->
+    <div id="rightDefaultContent">
+      <div class="logo">
+        <div class="logo-wrapper">
+          <img src="{{ url_for('static', filename='funda.png'  ) }}" alt="School Logo">
+          <span class="logo-text"></span>
+        </div>
+      </div>
+      <h2>Admin access</h2>
+
+      <!-- Flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash-message flash-{{ category }}">
+              <i class="fas fa-info-circle"></i> {{ message }}
+            </div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('admin_login') }}">
+        <div class="input-group">
+          <input type="text" name="username" placeholder="Username" required>
+          <i class="fas fa-user"></i>
+        </div>
+        <div class="input-group password-group">
+          <input type="password" name="password" id="loginPassword" placeholder="Password" required>
+          <i class="fas fa-eye toggle-password-icon" id="toggleLoginPassword"></i>
+        </div>
+        <div class="input-group no-icon">
+          <select name="term" required>
+            <option value="" disabled selected>Select academic term</option>
+            <option value="Term 1">Term 1</option>
+            <option value="Term 2">Term 2</option>
+            <option value="Term 3">Term 3</option>
+          </select>
+        </div>
+        <button type="submit"><i class="fas fa-sign-in-alt"></i> Sign in</button>
+      </form>
+      <div class="secure-badge">
+        <i class="fas fa-shield"></i> End‑to‑end encrypted
+      </div>
+    </div>
+
+    <!-- SIGN-UP STATE: right panel becomes "sidebar prompt" -->
+    <div id="rightSignUpContent" class="hidden">
+      <div class="sidebar-login-prompt">
+        <div class="icon-large">
+          <i class="fas fa-arrow-left"></i>
+        </div>
+        <h3>Already registered?</h3>
+        <p>Return to the admin login.</p>
+        <button class="btn-login-switch" id="switchToLoginBtn">
+          <i class="fas fa-sign-in-alt"></i> Back to Login
+        </button>
+      </div>
+      <div style="margin-top: 40px; text-align: center; color: #5e7e9c; font-size: 0.9rem;">
+        <i class="fas fa-lock"></i> Your data stays private
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // DOM refs
+    const leftDefault = document.getElementById('leftDefaultContent');
+    const leftSignUp = document.getElementById('leftSignUpContent');
+    const rightDefault = document.getElementById('rightDefaultContent');
+    const rightSignUp = document.getElementById('rightSignUpContent');
+
+    const showSignUpBtn = document.getElementById('showSignUpBtn');
+    const switchToLoginBtn = document.getElementById('switchToLoginBtn');
+
+    // ----- PASSWORD TOGGLE (robust) -----
+    function setupPasswordToggle(toggleIcon, passwordField) {
+      if (!toggleIcon || !passwordField) return;
+      const newIcon = toggleIcon.cloneNode(true);
+      toggleIcon.parentNode.replaceChild(newIcon, toggleIcon);
+      
+      newIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isPassword = passwordField.getAttribute('type') === 'password';
+        passwordField.setAttribute('type', isPassword ? 'text' : 'password');
+        newIcon.classList.toggle('fa-eye', !isPassword);
+        newIcon.classList.toggle('fa-eye-slash', isPassword);
+      });
+      return newIcon;
+    }
+
+    // Login toggle init
+    let loginToggle = document.getElementById('toggleLoginPassword');
+    let loginPass = document.getElementById('loginPassword');
+    if (loginToggle && loginPass) setupPasswordToggle(loginToggle, loginPass);
+
+    function initSignupToggle() {
+      const signupToggle = document.getElementById('toggleSignupPassword');
+      const signupPass = document.getElementById('signupPassword');
+      if (signupToggle && signupPass) setupPasswordToggle(signupToggle, signupPass);
+    }
+
+    // ----- VIEW SWITCHING -----
+    function showSignUpView() {
+      leftDefault.classList.add('hidden');
+      leftSignUp.classList.remove('hidden');
+      rightDefault.classList.add('hidden');
+      rightSignUp.classList.remove('hidden');
+      initSignupToggle();
+    }
+
+    function showLoginView() {
+      leftDefault.classList.remove('hidden');
+      leftSignUp.classList.add('hidden');
+      rightDefault.classList.remove('hidden');
+      rightSignUp.classList.add('hidden');
+      
+      // re-bind login toggle
+      const loginTog = document.getElementById('toggleLoginPassword');
+      const loginPassField = document.getElementById('loginPassword');
+      if (loginTog && loginPassField) setupPasswordToggle(loginTog, loginPassField);
+    }
+
+    // Event listeners
+    showSignUpBtn?.addEventListener('click', showSignUpView);
+    switchToLoginBtn?.addEventListener('click', showLoginView);
+
+    console.log('✅ Neo-Class — fully integrated with Flask backend.');
+  })();
+</script>
 </body>
 </html>

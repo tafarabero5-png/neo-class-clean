@@ -1,37 +1,147 @@
+/* Page setup */
+@page {
+    size: A4;
+    margin: 18mm;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  margin: 30px;
-}
-.report {
-  page-break-after: always;
-  border: 1px solid #ccc;
-  padding: 20px;
-}
-
-h2, h3 {
-  text-align: center;
-  margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    font-size: 14px;
+    color: #111;
+    background: white;
+    margin: 0;
+    padding: 0;
 }
 
-.info {
-  margin-top: 20px;
-  margin-bottom: 10px;
+/* Report wrapper */
+.report-wrapper {
+    width: 210mm;           /* full A4 width */
+    min-height: 297mm;      /* full A4 height */
+    margin: 0 auto;         /* center horizontally */
+    padding: 15px;
+    border: 3px solid #1e40af;
+    box-sizing: border-box; /* include padding in width */
+    background: white;
+    page-break-after: always; /* each student starts new page */
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
+/* Header with logos and school name */
+.school-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid #1e40af;
+    padding-bottom: 12px;
+    margin-bottom: 15px;
 }
 
-th, td {
-  border: 1px solid #333;
-  padding: 6px;
-  text-align: left;
+.school-header .logo {
+    height: 75px;
+    width: auto;
 }
 
-.footer {
-  margin-top: 30px;
-  font-size: 0.9em;
-  text-align: right;
+.school-text {
+    text-align: center;
+    flex-grow: 1;
+}
+
+.school-text h1 {
+    margin: 0;
+    font-size: 28px;
+    color: #1e40af;
+}
+
+.school-text p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #444;
+}
+
+/* Student info block */
+.student-block {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.student-block .left {
+    text-align: left;
+    width: 48%;
+    font-size: 14px;
+}
+
+.student-block .right {
+    text-align: right;
+    width: 48%;
+    font-size: 14px;
+}
+
+.student-block p {
+    margin: 4px 0;
+}
+
+/* Marks table */
+.marks-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.marks-table th {
+    background: #1e40af;
+    color: white;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #333;
+}
+
+.marks-table td {
+    border: 1px solid #333;
+    padding: 7px;
+    text-align: center;
+    font-size: 13px;
+}
+
+.grade {
+    font-weight: bold;
+}
+
+/* Summary section */
+.summary {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Signatures */
+.signature-area {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    font-size: 14px;
+}
+
+.signature-area .left,
+.signature-area .right {
+    width: 45%;
+}
+
+.signature-area .left {
+    text-align: left;
+}
+
+.signature-area .right {
+    text-align: right;
+}
+
+/* Page break */
+.page-break {
+    page-break-after: always;
+}
+
+/* Avoid extra borders stacking */
+* {
+    box-sizing: border-box;
 }

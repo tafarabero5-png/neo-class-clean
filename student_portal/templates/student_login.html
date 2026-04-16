@@ -1,31 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Student Login</title>
-  <link rel="stylesheet" href="{{ url_for('static',
-  filename='student_login.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='student_login.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="login-container">
-  
-  <div class="logo">
-    <img src="{{url_for('static',filename='school.png')}}" alt="Logo" class="logo">
-  </div>
-  <h2>Student Login</h2>
-  <form method="POST" action="/">
-    <input type="text" name="firstname" placeholder="Enter Your First Name" required><br>
-    <input type="text" name="surname" placeholder="Enter Your Surname"required><br>
-    <input type="text" name="id" placeholder="Student ID Number" required><br><br>
-    <label for="term">Select Term:</label>
-  <select name="term" required>
-    <option value="Term 1">Term 1</option>
-    <option value="Term 2">Term 2</option>
-    <option value="Term 3">Term 3</option>
-  </select><br><br>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="logo-section">
+                    <img src="{{ url_for('static', filename='funda.png') }}" alt="School Logo" class="logo">
+                    <h1>First Class High School</h1>
+                    <p>Student Results Portal</p>
+                </div>
 
-    <button type="submit">Check Results</button>
-  </form>
-  </div>
-  <h3>NEO-CLASS-FCA</h3>
+                {% if error %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle"></i> {{ error }}
+                </div>
+                {% endif %}
+
+                <form method="POST" action="/" class="login-form">
+                    <div class="form-group">
+                        <label for="firstname">First Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="surname">Surname</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="surname" name="surname" placeholder="Enter your surname" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id">Student ID</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-id-card"></i>
+                            <input type="text" id="id" name="id" placeholder="Enter your student ID" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="term">Select Term</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-calendar"></i>
+                            <select id="term" name="term" required>
+                                <option value="">Choose a term...</option>
+                                <option value="Term 1">Term 1</option>
+                                <option value="Term 2">Term 2</option>
+                                <option value="Term 3">Term 3</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-login">
+                        <i class="fas fa-sign-in-alt"></i> Check Results
+                    </button>
+                </form>
+
+                <div class="login-footer">
+                    <p>For assistance, contact the school administration office</p>
+                    <p class="contact-info">📞 +1 (555) 123-4567 | 📧 admin@firstclass.edu</p>
+                </div>
+            </div>
+
+            <div class="login-illustration">
+                <div class="illustration-content">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h2>Welcome Back!</h2>
+                    <p>Access your academic results and track your progress throughout the school year.</p>
+                    <ul class="features-list">
+                        <li><i class="fas fa-check"></i> View your grades and marks</li>
+                        <li><i class="fas fa-check"></i> Track academic progress</li>
+                        <li><i class="fas fa-check"></i> Download report cards</li>
+                        <li><i class="fas fa-check"></i> Secure & Private</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

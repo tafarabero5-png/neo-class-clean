@@ -1,59 +1,331 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Student Results</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='results_design.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Results Portal</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='results_design.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <div class="container">
-    <div class="header-s">
-     <header>
-      <img src="{{url_for('static',filename='school.png')}}" alt="Logo" class="logo">
-      <div class="title">
-      <h1>Result Portal</h1>
-      <p>First Class Academy</p>
-      </div>
-    </header>
-     </div>
-    
-  <h4>STUDENT NAME <span class="name">: {{ student.firstname }} {{ student.surname }}</span></h4>
-  <h4>LEVEL <span class="level">: Advanced Level</span></h4>
-  <h4>CLASS<span class="class">: {{student.class_name}}</span></h4>
-  <h4>TERM<span class="term">: {{term}}</span></h4>
-  
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <img src="{{ url_for('static', filename='funda.png') }}" alt="Logo">
+                <span>First Class High School</span>
+            </div>
+            <div class="nav-menu">
+                <a href="/student_portal" class="nav-link active">
+                    <i class="fas fa-chart-bar"></i> Results
+                </a>
+                <a href="/student_profile" class="nav-link">
+                    <i class="fas fa-user-circle"></i> Profile
+                </a>
+                <a href="/download_results" class="nav-link">
+                    <i class="fas fa-download"></i> Download
+                </a>
+                <a href="/logout" class="nav-link logout">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
 
-  
+    <div class="page-wrapper">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>Academic Results</h1>
+                    <p class="breadcrumb">
+                        <i class="fas fa-home"></i> Home / 
+                        <span>{{ term }}</span>
+                    </p>
+                </div>
+                <div class="header-right">
+                    <div class="header-info">
+                        <p><strong>{{ student.firstname }} {{ student.surname }}</strong></p>
+                        <p>ID: {{ student.id }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-  
-   <table border="1" cellpadding="8">
-    <thead>
-        <tr class="subject-row">
-            <th>SUBJECT</th>
-            <th>Score</th>
-            <th>Grade</th>
-            
-        </tr>
-    </thead>
-    <tbody>
-      {% for result in results %}
-        <tr>
-            <td>{{ result.subject }}</td>
-            <td>{{ result.score }}</td>
-            <td>{{ result.grade }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-<p>Total Subjects: {{ results|length }}</p>
-  <h3>NEO-CLASS-FCA</h3>
-  </div>
+        <!-- Main Content -->
+        <div class="container">
+            <!-- Summary Cards -->
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Total Subjects</p>
+                        <p class="card-value">{{ results|length }}</p>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Average Score</p>
+                        <p class="card-value">{{ average }}/100</p>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Pass Rate</p>
+                        <p class="card-value">{{ pass_rate }}%</p>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="card-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-label">Term</p>
+                        <p class="card-value">{{ term }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performers -->
+            {% if best_subject and worst_subject %}
+            <div class="performance-grid">
+                <div class="performance-card best">
+                    <h3><i class="fas fa-trophy"></i> Best Subject</h3>
+                    <p class="subject-name">{{ best_subject.subject }}</p>
+                    <p class="subject-score">{{ best_subject.score }}/100</p>
+                    <p class="subject-grade">Grade: <strong>{{ best_subject.grade }}</strong></p>
+                </div>
+
+                <div class="performance-card improvement">
+                    <h3><i class="fas fa-arrow-up"></i> Needs Improvement</h3>
+                    <p class="subject-name">{{ worst_subject.subject }}</p>
+                    <p class="subject-score">{{ worst_subject.score }}/100</p>
+                    <p class="subject-grade">Grade: <strong>{{ worst_subject.grade }}</strong></p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Results Table -->
+            <div class="results-card">
+                <h2>Detailed Results</h2>
+                <div class="table-responsive">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Score</th>
+                                <th>Grade</th>
+                                <th>Comment</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for result in results %}
+                            <tr class="{% if result.score >= 50 %}pass{% else %}fail{% endif %}">
+                                <td>{{ result.subject }}</td>
+                                <td>
+                                    <div class="score-bar">
+                                        <span class="score-value">{{ result.score }}</span>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" data-score="{{ result.score }}"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="grade-badge grade-{{ result.grade }}">
+                                        {{ result.grade }}
+                                    </span>
+                                </td>
+                                <td>{{ result.comment or '-' }}</td>
+                                <td>
+                                    {% if result.score >= 50 %}
+                                        <span class="status-badge pass">Passed</span>
+                                    {% else %}
+                                        <span class="status-badge fail">Failed</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3>Performance Overview</h3>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Grade Distribution</h3>
+                    <div class="chart-container">
+                        <canvas id="gradeChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="actions-section">
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print Results
+                </button>
+                <a href="/download_results" class="btn btn-success">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const chartConfig = {
+                subjects: JSON.parse('{{ subjects | tojson | safe }}'),
+                scores: JSON.parse('{{ scores | tojson | safe }}'),
+                average: parseFloat('{{ average }}'),
+                gradeCounts: {
+                    A: parseInt('{{ grade_counts.A }}'),
+                    B: parseInt('{{ grade_counts.B }}'),
+                    C: parseInt('{{ grade_counts.C }}'),
+                    D: parseInt('{{ grade_counts.D }}'),
+                    E: parseInt('{{ grade_counts.E }}'),
+                    O: parseInt('{{ grade_counts.O }}')
+                }
+            };
+
+            function initializeProgressBars() {
+                const progressFills = document.querySelectorAll('.progress-fill');
+                progressFills.forEach(function(fill) {
+                    const score = fill.getAttribute('data-score');
+                    if (score) {
+                        fill.style.width = score + '%';
+                    }
+                });
+            }
+
+            function initPerformanceChart() {
+                const ctx = document.getElementById('performanceChart');
+                if (!ctx) return;
+
+                const averageArray = new Array(chartConfig.subjects.length).fill(chartConfig.average);
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartConfig.subjects,
+                        datasets: [
+                            {
+                                label: 'Your Scores',
+                                data: chartConfig.scores,
+                                borderColor: '#1f3a93',
+                                backgroundColor: 'rgba(31, 58, 147, 0.05)',
+                                borderWidth: 3,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 6,
+                                pointBackgroundColor: '#1f3a93',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointHoverRadius: 8
+                            },
+                            {
+                                label: 'Average',
+                                data: averageArray,
+                                borderColor: '#ffc107',
+                                borderDash: [5, 5],
+                                borderWidth: 2,
+                                pointRadius: 0,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function initGradeChart() {
+                const ctx = document.getElementById('gradeChart');
+                if (!ctx) return;
+
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['A', 'B', 'C', 'D', 'E', 'O'],
+                        datasets: [
+                            {
+                                data: [
+                                    chartConfig.gradeCounts.A,
+                                    chartConfig.gradeCounts.B,
+                                    chartConfig.gradeCounts.C,
+                                    chartConfig.gradeCounts.D,
+                                    chartConfig.gradeCounts.E,
+                                    chartConfig.gradeCounts.O
+                                ],
+                                backgroundColor: [
+                                    '#28a745',
+                                    '#20c997',
+                                    '#17a2b8',
+                                    '#ffc107',
+                                    '#fd7e14',
+                                    '#dc3545'
+                                ],
+                                borderColor: '#fff',
+                                borderWidth: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom'
+                            }
+                        }
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                initializeProgressBars();
+                initPerformanceChart();
+                initGradeChart();
+            });
+        })();
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-

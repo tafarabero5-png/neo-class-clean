@@ -29,19 +29,3 @@ body{
     font-size: 18px;
     width: 100%;
 }
-.login_buttons:hover{
-    background-color: dodgerblue;
-}
-h3{position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background-color: #00264d;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 25px;
-    font-weight: bold;
-    font-size: 14px;
-    display: inline-block;
-    
-
-}

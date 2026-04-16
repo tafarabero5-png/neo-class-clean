@@ -1,0 +1,44 @@
+<h2>Edit Marks</h2>
+
+<form method="POST" action="/enter_marks">
+    <input type="hidden" name="class_id" value="{{ class_id }}">
+    <input type="hidden" name="subject_id" value="{{ subject_id }}">
+    <input type="hidden" name="term" value="{{ term }}">
+    <input type="hidden" name="mode" value="edit">
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Student ID</th>
+                <th>Surname</th>
+                <th>Firstname</th>
+                <th>Mark</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.id }}</td>
+                <td>{{ student.surname }}</td>
+                <td>{{ student.firstname }}</td>
+                <td>
+                    <input type="number"
+                           name="mark_{{ student.id }}"
+                           min="0" max="100"
+                           value="{{ marks[student.id].score if student.id in marks else '' }}"
+                           required>
+                </td>
+                <td>
+                    <input type="text"
+                           name="comment_{{ student.id }}"
+                           value="{{ marks[student.id].comment if student.id in marks else '' }}">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <br>
+    <button type="submit">Update Marks</button>
+</form>

@@ -1,27 +1,63 @@
-
 <!DOCTYPE html>
-<html>
-<head> 
-  <title>Teacher Login</title>
-  <link rel="stylesheet" href="{{url_for('static',
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="{{url_for('static',
    filename='style.css') }}">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  <div class="login-container">
-    <div class="logo">
-    <img src="{{url_for('static',filename='school.png')}}" alt="Logo" class="logo">
-  </div>
-  <h2>Teacher Login</h2>
-  <form method="POST">
-    <input type="text" name="username" placeholder="Username" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
-    <button type="submit" >Login</button>
-    </form>
+    <div class="container">
+        <div class="left-panel">
+        <h2>Welcome to Neo-Class</h2>
+        <p>Login to  analise student perfomance.</p>
     
+     <div class="admin-container">
+      <form method="get" action="{{ url_for('admin_login') }}">
+  <button type="submit">Login As Admin??</button>
+  </form>
+  </div>
+      </div>
+      
+    <div class="right-panel">
+        <div class="logo">
+    <img src="{{url_for('static',filename='funda.png')}}" alt="Logo" class="logo">
+  </div>
+     <h2>Teacher Login</h2>
+    <form method="POST">
+        <div class="input-group">
+            <input type="text" name="username" placeholder="Username" required>
+            <i class="fas fa-user"></i>
+        </div>
 
+        <div class="input-group password-group">
+            <input type="password" name="password" id="password" placeholder="Password" required>
+            <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+        </div>
+
+        <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+    </form>
+    </div>    
+</form>
     </div>
+</div>
+
+<script>
+    function togglePasswordVisibility() {
+        const passwordInput = document.getElementById('password');
+        const toggleIcon = document.getElementById('togglePassword');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
+  
     
-  </div>
-  <h3>NEO-CLASS-FCA</h3>
 </body>
 </html>

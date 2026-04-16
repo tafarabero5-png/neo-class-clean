@@ -1,0 +1,83 @@
+
+        <div class="report-wrapper">
+            <img class="logo-img" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='60' viewBox='0 0 160 60'%3E%3Crect width='160' height='60' rx='14' fill='%23ffffff' opacity='0.2'/%3E%3Ctext x='18' y='42' font-family='Inter,Segoe UI, sans-serif' font-weight='800' font-size='30' fill='%2303448a'%3Efunda%3C/text%3E%3Ccircle cx='132' cy='28' r='10' fill='%2303448a'/%3E%3Cpath d='M128 32 L136 32 L132 24 Z' fill='white'/%3E%3C/svg%3E" alt="funda analytics">
+
+
+    <!-- HEADER -->
+    <div class="school-header">
+    <table width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+            <td width="15%" align="left">
+                <img src="file:///{{ logo_path }}" class="logo">
+            </td>
+
+            <td align="center">
+                <h1>{{ school_name }}</h1>
+                <p>Official Student Performance Report</p>
+            </td>
+
+            <td width="15%" align="right">
+                <img src="file:///{{ logo_path }}" class="logo">
+            </td>
+        </tr>
+    </table>
+</div>
+
+    <!-- STUDENT INFO -->
+    <div class="student-block">
+        <div class="student-left">
+            <p><strong>Name:</strong> {{ student.name }}</p>
+            <p><strong>Class:</strong> {{ class_name }}</p>
+        </div>
+        <div class="student-right">
+            <p><strong>Term:</strong> {{ student.term }}</p>
+            <p><strong>Level:</strong> {{ student.level }}</p>
+        </div>
+    </div>
+
+    <!-- MARKS TABLE -->
+    <table class="marks-table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Mark</th>
+                <th>Grade</th>
+                <th>Comment</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in results %}
+            <tr>
+                <td>{{ m.subject }}</td>
+                <td>{{ m.score }}</td>
+                <td class="grade">{{ m.grade }}</td>
+                <td>{{ m.comment or "" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+    <table class="summary-table" width="100%">
+    <tr>
+        <td align="left">Average: <strong>{{ average }}%</strong></td>
+        <td align="center">Overall Grade: <strong>{{ student.overall_grade or "N/A" }}</strong></td>
+        <td align="right">Pass Rate: <strong>{{ student.pass_rate or "N/A" }}%</strong></td>
+    </tr>
+   </table>
+
+
+    <!-- SIGNATURES -->
+    <!-- SIGNATURES -->
+<table class="signature-table" width="100%">
+    <tr>
+        <td align="left">Class Teacher: __________________________</td>
+        <td align="right">Headmaster: ____________________________</td>
+    </tr>
+</table>
+
+
+</div>
+
+

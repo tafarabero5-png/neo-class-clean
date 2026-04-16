@@ -1,48 +1,679 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Enter Marks</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='design_entermarks.css') }}">
-</head>
-<div class="container">
-<body>
-    <div class="container">
-    <h2>Enter Marks for {{ class_name }} - {{ subject_name }} ({{ term }})</h2>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter Marks · Neo‑Class</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ========================================= */
+    /* WORLD‑CLASS EDIT MARKS – COLLAPSIBLE SIDEBAR */
+    /* ========================================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-    <form method="POST" action="/enter_marks">
-        <!-- Hidden inputs to keep data -->
+    body {
+      background: #f0f4f8;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ---------- COLLAPSIBLE SIDEBAR ---------- */
+    .teacher-sidebar {
+      width: 300px;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px);
+      border-right: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 24px 18px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 5px 0 25px rgba(0, 0, 0, 0.03);
+      transition: width 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+      position: relative;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .teacher-sidebar.collapsed {
+      width: 80px;
+      padding: 24px 10px;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      top: 20px;
+      right: -12px;
+      width: 28px;
+      height: 28px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #64748b;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      z-index: 10;
+      transition: all 0.2s;
+    }
+
+    .sidebar-toggle:hover {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+    }
+
+    .sidebar-toggle i {
+      font-size: 14px;
+      transition: transform 0.3s;
+    }
+
+    .teacher-sidebar.collapsed .sidebar-toggle i {
+      transform: rotate(180deg);
+    }
+
+    .sidebar-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eef2f6;
+      white-space: nowrap;
+    }
+
+    .teacher-sidebar.collapsed .sidebar-header {
+      justify-content: center;
+    }
+
+    .teacher-sidebar.collapsed .teacher-info,
+    .teacher-sidebar.collapsed .sidebar-section h3 span,
+    .teacher-sidebar.collapsed .exam-type-selector select,
+    .teacher-sidebar.collapsed .events-list {
+      display: none;
+    }
+
+    .teacher-sidebar.collapsed .sidebar-section h3 i {
+      margin-right: 0;
+    }
+
+    .teacher-avatar {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(145deg, #3b82f6, #2563eb);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      box-shadow: 0 8px 14px -6px #3b82f6;
+      flex-shrink: 0;
+    }
+
+    .teacher-info h4 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .teacher-info p {
+      color: #64748b;
+      font-size: 13px;
+    }
+
+    .sidebar-section {
+      margin-bottom: 28px;
+    }
+
+    .sidebar-section h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exam-type-selector select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      background: white;
+      font-weight: 500;
+      color: #0f172a;
+      font-size: 14px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      cursor: pointer;
+    }
+
+    .events-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-event-item {
+      background: white;
+      border-radius: 16px;
+      padding: 14px 16px;
+      border-left: 6px solid;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+      transition: transform 0.15s;
+    }
+
+    .sidebar-event-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 8px 16px -6px rgba(0,0,0,0.1);
+    }
+
+    .sidebar-event-title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 4px;
+      color: #0f172a;
+    }
+
+    .sidebar-event-desc {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+
+    .sidebar-event-date {
+      font-size: 11px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ---------- MAIN CONTENT ---------- */
+    .main-content {
+      flex: 1;
+      padding: 24px 32px;
+      overflow-y: auto;
+      transition: padding 0.3s;
+    }
+
+    /* Top Bar */
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tabs button {
+      background: white;
+      color: #334155;
+      border: none;
+      padding: 12px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 40px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+      transition: all 0.2s;
+      border: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tabs button i {
+      font-size: 16px;
+    }
+
+    .tabs button:hover {
+      background: #f8fafc;
+      border-color: #cbd5e1;
+    }
+
+    .tabs button.active-tab-btn {
+      background: #3b82f6;
+      color: white;
+      border-color: #3b82f6;
+      box-shadow: 0 8px 16px -6px #3b82f6;
+    }
+
+    .logout-top {
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .logout-top:hover {
+      background: #fee2e2;
+      border-color: #fecaca;
+      color: #dc2626;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+    }
+
+    .active-tab {
+      display: block;
+    }
+
+    /* Container & Table */
+    .marks-container {
+      background: white;
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .exam-badge {
+      background: linear-gradient(145deg, #3b82f6, #2563eb);
+      color: white;
+      padding: 6px 16px;
+      border-radius: 40px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-left: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin-bottom: 30px;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.02);
+    }
+
+    table th {
+      background: #1e293b;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      font-size: 13px;
+      padding: 18px 16px;
+      text-align: left;
+      border: none;
+    }
+
+    table td {
+      padding: 16px;
+      background: white;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table tbody tr:hover td {
+      background: #fafcff;
+    }
+
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      font-size: 14px;
+      transition: all 0.2s;
+      background: #fafcff;
+    }
+
+    input[type="number"]:focus,
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+      background: white;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(145deg, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 12px 24px -8px #3b82f6;
+      transition: all 0.25s;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 30px -10px #3b82f6;
+    }
+
+    iframe {
+      width: 100%;
+      min-height: 600px;
+      border: none;
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .loading-spinner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px;
+      color: #3b82f6;
+      font-size: 18px;
+    }
+
+    .loading-spinner i {
+      margin-right: 10px;
+    }
+
+    /* Responsive – only stack on very small screens */
+    @media (max-width: 500px) {
+      body {
+        flex-direction: column;
+      }
+      .teacher-sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      .teacher-sidebar.collapsed {
+        width: 100%;
+      }
+      .sidebar-toggle {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body data-subject-id="{{ subject_id }}" data-class-id="{{ class_id }}" data-term="{{ term }}">
+
+<!-- COLLAPSIBLE SIDEBAR -->
+<div class="teacher-sidebar" id="sidebar">
+  <div class="sidebar-toggle" onclick="toggleSidebar()">
+    <i class="fas fa-chevron-left"></i>
+  </div>
+
+  <div class="sidebar-header">
+    <div class="teacher-avatar">
+      <i class="fas fa-chalkboard-teacher"></i>
+    </div>
+    <div class="teacher-info">
+      <h4>{{ session.get('teacher', 'Teacher') }}</h4>
+      <p>{{ class_name }} · {{ subject_name }}</p>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3><i class="fas fa-flask"></i> <span>Exam Type</span></h3>
+    <div class="exam-type-selector">
+      <select id="examTypeSelect" onchange="updateExamType()">
+        <option value="Midterm">📝 Midterm Exam</option>
+        <option value="Final">🎯 Final Exam</option>
+        <option value="Test">📋 Class Test</option>
+        <option value="Assignment">📚 Assignment</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="sidebar-section">
+    <h3><i class="fas fa-calendar-alt"></i> <span>Upcoming Events</span></h3>
+    <div class="events-list" id="sidebarEventsList">
+      <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+  <!-- Top Bar with Tabs -->
+  <div class="top-bar">
+    <div class="tabs">
+      <button id="tabHomeBtn" class="active-tab-btn" onclick="showTab('enter_marks')"><i class="fas fa-home"></i> Enter Marks</button>
+      <button id="tabPerfBtn" onclick="loadPerformance()"><i class="fas fa-chart-bar"></i> Performance</button>
+      <button id="tabEditBtn" onclick="showTab('edit_mark')"><i class="fas fa-edit"></i> Edit Marks</button>
+    </div>
+    <a href="{{ url_for('logout') }}" class="logout-top"><i class="fas fa-sign-out-alt"></i> Logout</a>
+  </div>
+
+  <!-- HOME TAB (Enter Marks) – ALWAYS SHOW EMPTY FIELDS -->
+  <div id="enter_marks" class="tab-content active-tab">
+    <div class="marks-container">
+      <h2>Enter Marks for {{ class_name }} - {{ subject_name }} ({{ term }}) 
+        <span class="exam-badge" id="enterExamBadge">Midterm</span>
+      </h2>
+      <form method="POST" action="/enter_marks">
         <input type="hidden" name="class_id" value="{{ class_id }}">
         <input type="hidden" name="subject_id" value="{{ subject_id }}">
         <input type="hidden" name="term" value="{{ term }}">
+        <!-- Always use mode='add' for fresh entry; backend will treat as edit if marks exist anyway -->
+        <input type="hidden" name="mode" value="add">
+        <input type="hidden" name="exam_type" id="enterExamTypeInput" value="Midterm">
 
-        <table border="1" cellpadding="8">
-    <thead>
-        <tr>
-            <th>Student ID</th>
-            <th>Surname</th>
-            <th>Firstname</th>
-            <th>Mark</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for student in students %}
-        <tr>
-            <td>{{ student.id }}</td>
-            <td>{{ student.surname }}</td>
-            <td>{{ student.firstname }}</td>
-            <td>
-                <input type="number" name="mark_{{ student.id }}" min="0" max="100" required>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        <table>
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Surname</th>
+              <th>Firstname</th>
+              <th>Mark</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            <tr>
+              <td><strong>{{ student.id }}</strong></td>
+              <td>{{ student.surname }}</td>
+              <td>{{ student.firstname }}</td>
+              <td>
+                <!-- Always empty for fresh entry -->
+                <input type="number" name="mark_{{ student.id }}" min="0" max="100" step="0.01" required 
+                       onchange="onMarkChange(this, {{ student.id }})" value="">
+              </td>
+              <td>
+                <input type="text" name="comment_{{ student.id }}" id="comment_{{ student.id }}" value="" placeholder="Auto‑filled">
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Save All Marks</button>
+      </form>
+    </div>
+  </div>
 
+  <!-- PERFORMANCE TAB -->
+  <div id="performance" class="tab-content">
+    <iframe id="performance_frame"></iframe>
+  </div>
 
-        <br>
-        <button type="submit">Save Marks</button>
-    </form>
+  <!-- EDIT MARKS TAB – SHOWS EXISTING MARKS -->
+  <div id="edit_mark" class="tab-content">
+    <div class="marks-container">
+      <h2>Edit Marks for {{ class_name }} - {{ subject_name }} ({{ term }}) 
+        <span class="exam-badge" id="editExamBadge">Midterm</span>
+      </h2>
+      <form method="POST" action="/enter_marks">
+        <input type="hidden" name="class_id" value="{{ class_id }}">
+        <input type="hidden" name="subject_id" value="{{ subject_id }}">
+        <input type="hidden" name="term" value="{{ term }}">
+        <input type="hidden" name="mode" value="edit">
+        <input type="hidden" name="exam_type" id="editExamTypeInput" value="Midterm">
+
+        <table>
+          <thead>
+            <tr>
+              <th>Student ID</th>
+              <th>Surname</th>
+              <th>Firstname</th>
+              <th>Mark</th>
+              <th>Comment</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student in students %}
+            {% set student_id_str = student.id|string %}
+            {% set mark_data = marks.get(student_id_str) or marks.get(student.id) or {} %}
+            <tr>
+              <td><strong>{{ student.id }}</strong></td>
+              <td>{{ student.surname }}</td>
+              <td>{{ student.firstname }}</td>
+              <td>
+                <input type="number" name="mark_{{ student.id }}" min="0" max="100" step="0.01" required
+                       value="{{ mark_data.get('score', '') }}">
+              </td>
+              <td>
+                <input type="text" name="comment_{{ student.id }}" 
+                       value="{{ mark_data.get('comment', '') }}">
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Update Marks</button>
+      </form>
+    </div>
+  </div>
 </div>
- 
+
+<script>
+  // Data from Flask
+  const SUBJECT_ID = document.body.dataset.subjectId;
+  const CLASS_ID = document.body.dataset.classId;
+  const TERM = document.body.dataset.term;
+
+  // ---------- SIDEBAR TOGGLE ----------
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+  }
+
+  // ---------- EXAM TYPE SYNC ----------
+  function updateExamType() {
+    const examType = document.getElementById('examTypeSelect').value;
+    // Update all hidden inputs and badges
+    const enterInput = document.getElementById('enterExamTypeInput');
+    const editInput = document.getElementById('editExamTypeInput');
+    const enterBadge = document.getElementById('enterExamBadge');
+    const editBadge = document.getElementById('editExamBadge');
+    if (enterInput) enterInput.value = examType;
+    if (editInput) editInput.value = examType;
+    if (enterBadge) enterBadge.textContent = examType;
+    if (editBadge) editBadge.textContent = examType;
+  }
+
+  // ---------- TAB SWITCHING ----------
+  function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active-tab'));
+    document.getElementById(tabId).classList.add('active-tab');
+    
+    document.querySelectorAll('.tabs button').forEach(btn => btn.classList.remove('active-tab-btn'));
+    if (tabId === 'enter_marks') document.getElementById('tabHomeBtn').classList.add('active-tab-btn');
+    else if (tabId === 'performance') document.getElementById('tabPerfBtn').classList.add('active-tab-btn');
+    else if (tabId === 'edit_mark') document.getElementById('tabEditBtn').classList.add('active-tab-btn');
+  }
+
+  // ---------- PERFORMANCE IFRAME ----------
+  function loadPerformance() {
+    showTab('performance');
+    const iframe = document.getElementById('performance_frame');
+    if (!iframe.src) {
+      iframe.src = `/marks_success/${SUBJECT_ID}/${CLASS_ID}/${TERM}`;
+    }
+  }
+
+  // ---------- AUTO-COMMENT (for Enter Marks) ----------
+  async function onMarkChange(input, studentId) {
+    const mark = parseFloat(input.value);
+    const commentInput = document.getElementById(`comment_${studentId}`);
+    if (isNaN(mark) || mark < 0 || mark > 100) return;
+    try {
+      const res = await fetch(`/api/suggest-comment?score=${mark}`);
+      const data = await res.json();
+      if (commentInput) commentInput.value = data.comment || '';
+    } catch (e) {
+      console.error('Comment fetch error', e);
+    }
+  }
+
+  // ---------- SIDEBAR EVENTS ----------
+  async function loadSidebarEvents() {
+    const container = document.getElementById('sidebarEventsList');
+    if (!container) return;
+    try {
+      const res = await fetch('/api/events?limit=5');
+      const data = await res.json();
+      const events = data.events || [];
+      if (!events.length) {
+        container.innerHTML = '<p style="color:#999; padding:10px;">No upcoming events</p>';
+        return;
+      }
+      container.innerHTML = events.slice(0, 4).map(ev => `
+        <div class="sidebar-event-item" style="border-left-color: ${ev.color};">
+          <div class="sidebar-event-title">${ev.title}</div>
+          <div class="sidebar-event-desc">${ev.description || ''}</div>
+          <div class="sidebar-event-date"><i class="far fa-calendar-alt"></i> ${new Date(ev.start).toLocaleDateString()}</div>
+        </div>
+      `).join('');
+    } catch (e) {
+      container.innerHTML = '<p style="color:#e74c3c;">Failed to load events</p>';
+    }
+  }
+
+  // ---------- INITIALIZATION ----------
+  window.onload = function() {
+    updateExamType();
+    loadSidebarEvents();
+    showTab('enter_marks');
+  };
+</script>
 </body>
 </html>
