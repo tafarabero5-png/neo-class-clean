@@ -24,5 +24,5 @@ COPY . .
 # Set working directory to where app.py lives
 WORKDIR /app/teacher_portal
 
-# Run the app
-CMD ["gunicorn", "app:app"]
+# Run the app (shell form to allow $PORT expansion)
+CMD gunicorn app:app --bind 0.0.0.0:$PORT
