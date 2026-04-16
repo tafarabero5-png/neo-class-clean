@@ -4,8 +4,10 @@ FROM python:3.14-slim-bookworm
 # Set working directory inside container
 WORKDIR /app
 
-# Install all system dependencies required by WeasyPrint and common Python packages
-RUN apt-get update && apt-get install -y \
+# Install system dependencies required by WeasyPrint (including build tools)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-dev \
     libcairo2 \
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
@@ -22,8 +24,11 @@ RUN apt-get update && apt-get install -y \
 
 # Copy requirements and install Python packages
 COPY teacher_portal/requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN echo "=== Installing Python packages ===" && \
+    pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    echo "=== Installed packages ===" && \
+    pip list | grep -E "weasyprint|Flask|gunicorn"
 
 # Copy the rest of the application code
 COPY . .
@@ -31,5 +36,5 @@ COPY . .
 # Set working directory to where app.py lives
 WORKDIR /app/teacher_portal
 
-# Run the app (shell form to allow $PORT expansion)
+# Run the app
 CMD gunicorn app:app --bind 0.0.0.0:$PORT
