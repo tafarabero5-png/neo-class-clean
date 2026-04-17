@@ -23,24 +23,23 @@ ADMIN_SIGNUP_SECRET = "NEO-CLASS-2025"
 
 #database  connection function
 def get_database():
-    host = os.getenv('DB_HOST')
-    user = os.getenv('DB_USER')
-    password = os.getenv('DB_PASSWORD')
-    database = os.getenv('DB_NAME')
-
-    # Debug print (optional, remove later)
-    print(f"Connecting with: host={host}, user={user}, database={database}")
+    host = os.getenv('DB_HOST', '').strip()
+    user = os.getenv('DB_USER', '').strip()
+    password = os.getenv('DB_PASSWORD', '').strip()
+    database = os.getenv('DB_NAME', '').strip()
+    port = os.getenv('DB_PORT', '5432').strip()
 
     if not all([host, user, password, database]):
         raise Exception("One or more environment variables are missing!")
+
     return psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    port=os.getenv("DB_PORT"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD"),
-    dbname=os.getenv("DB_NAME"),
-    cursor_factory=psycopg2.extras.DictCursor
-)
+        host=host,
+        port=port,
+        user=user,
+        password=password,
+        dbname=database,
+        cursor_factory=psycopg2.extras.DictCursor
+    )
 def log_activity_to_db(user_id, user_type, activity_type, description, status='Success'):
     """Insert an activity log entry with user ID, type, description, etc."""
     try:
