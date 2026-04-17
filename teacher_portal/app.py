@@ -12,9 +12,9 @@ import os
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from datetime import datetime
-
-from dotenv import load_dotenv
-load_dotenv()
+if not os.getenv("RENDER"):
+ from dotenv import load_dotenv
+ load_dotenv()
 
 import os
 app= Flask(__name__)
