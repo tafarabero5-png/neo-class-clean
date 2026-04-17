@@ -1,6 +1,1 @@
-venv/ 
-__pycache__/ 
-*.pyc 
-.vscode/ 
-Screenshots/ 
-teacher_portal/static/reports/ 
+teacher_portal/.env 
