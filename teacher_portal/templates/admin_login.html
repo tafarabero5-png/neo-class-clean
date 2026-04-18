@@ -2,12 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Neo-Class · Admin</title>
-  <!-- Font Awesome 6 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* ===== WORLD‑CLASS MODERN DESIGN ===== */
+    /* ===== MODERN DESIGN – FULLY RESPONSIVE ===== */
     * {
       margin: 0;
       padding: 0;
@@ -26,8 +25,8 @@
 
     .container {
       display: flex;
-      width: 960px;
-      max-width: 100%;
+      width: 100%;
+      max-width: 1200px;
       background: rgba(255,255,255,0.85);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
@@ -37,15 +36,16 @@
       transition: all 0.3s ease;
     }
 
-    /* LEFT PANEL — premium gradient */
+    /* LEFT PANEL – gradient, no circular logo background */
     .left-panel {
       background: linear-gradient(135deg, #03448a 0%, #0a5bb5 100%);
       color: white;
-      padding: 48px 36px;
-      width: 50%;
+      padding: 48px 32px;
+      width: 45%;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      text-align: center;
       position: relative;
       isolation: isolate;
     }
@@ -59,23 +59,33 @@
       z-index: -1;
     }
 
+    /* Plain Neo‑Class logo – no circle, just the image */
+    .neoclass-logo {
+      width: 140px;
+      margin: 0 auto 24px auto;
+      filter: drop-shadow(0 8px 12px rgba(0,0,0,0.15));
+      transition: transform 0.3s ease;
+    }
+    .neoclass-logo:hover {
+      transform: scale(1.02);
+    }
+
     .left-panel h2 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 700;
-      margin-bottom: 18px;
-      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
       line-height: 1.2;
     }
 
     .left-panel p {
-      font-size: 1.1rem;
+      font-size: 1rem;
+      line-height: 1.5;
       opacity: 0.9;
       margin-bottom: 36px;
-      line-height: 1.5;
-      font-weight: 400;
     }
 
-    /* SIGN-UP TOGGLE BUTTON — elegant */
+    /* SIGN-UP TOGGLE BUTTON – glass style */
     .btn-signup-toggle {
       background: rgba(255, 255, 255, 0.12);
       backdrop-filter: blur(8px);
@@ -83,12 +93,12 @@
       border: 1.5px solid rgba(255, 255, 255, 0.35);
       color: white;
       padding: 14px 28px;
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 600;
       border-radius: 60px;
       cursor: pointer;
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      align-self: flex-start;
+      align-self: center;
       display: inline-flex;
       align-items: center;
       gap: 12px;
@@ -111,56 +121,36 @@
       transform: translateX(3px);
     }
 
-    /* RIGHT PANEL — glassmorphism card */
+    /* RIGHT PANEL – glassmorphism */
     .right-panel {
       background: rgba(255,255,255,0.7);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       padding: 48px 40px;
-      width: 50%;
+      width: 55%;
       display: flex;
       flex-direction: column;
       justify-content: center;
-      box-sizing: border-box;
       min-height: 620px;
       border-left: 1px solid rgba(255,255,255,0.5);
     }
 
-    /* LOGO — world‑class presentation */
-   
-
-    .logo-wrapper {
+    /* School logo (right panel) – circular background kept (as originally) */
+    .logo {
+      height: 130px;
+      width: 130px;
+      margin: 0 auto 30px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
     }
-    .logo {
-    height: 130px;
-    width: 130px;
-    margin: 0 auto 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    background: white;
-    }
-
-   .logo img {
-    height: 100%;
-    width: 100%;
-    object-fit: contain;
-   }
-
-   
-
-    .logo-text {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(145deg, #03448a, #1a5fb0);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      letter-spacing: -0.5px;
+    .logo img {
+      height: 85%;
+      width: 85%;
+      object-fit: contain;
     }
 
     .right-panel h2 {
@@ -168,11 +158,11 @@
       margin-bottom: 32px;
       color: #0b2b4a;
       font-weight: 700;
-      font-size: 1.9rem;
+      font-size: 1.8rem;
       letter-spacing: -0.01em;
     }
 
-    /* INPUT GROUPS — refined */
+    /* INPUT GROUPS */
     .input-group {
       position: relative;
       margin-bottom: 24px;
@@ -206,7 +196,6 @@
       background: rgba(255, 255, 255, 0.7);
       backdrop-filter: blur(4px);
       transition: all 0.25s;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
       color: #0b2b4a;
       font-weight: 500;
     }
@@ -228,7 +217,7 @@
       display: none;
     }
 
-    /* BUTTONS — premium */
+    /* BUTTONS */
     .right-panel button,
     .left-panel .signup-action-btn {
       background: linear-gradient(145deg, #03448a, #0a5bb5);
@@ -247,7 +236,6 @@
       justify-content: center;
       gap: 12px;
       box-shadow: 0 12px 20px -8px rgba(3, 68, 138, 0.4);
-      letter-spacing: 0.3px;
     }
 
     .right-panel button:hover,
@@ -257,49 +245,44 @@
       box-shadow: 0 18px 28px -8px rgba(3, 68, 138, 0.5);
     }
 
-    /* LEFT PANEL SIGN-UP FORM (white inputs) */
+    /* LEFT PANEL SIGN-UP FORM */
     .left-panel .signup-form-container {
       width: 100%;
     }
-
     .left-panel .signup-title {
       font-size: 2rem;
       margin-bottom: 28px;
       font-weight: 700;
     }
-
     .left-panel .input-group {
       margin-bottom: 20px;
     }
-
     .left-panel .input-group input {
       background: rgba(255, 255, 255, 0.95);
       border: none;
       color: #1e293b;
       padding-right: 50px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
       border-radius: 20px;
     }
-
     .left-panel .input-group i {
       color: #03448a;
       right: 18px;
     }
-
     .left-panel .signup-action-btn {
       background: white;
       color: #03448a;
       margin-top: 24px;
-      font-weight: 700;
-      box-shadow: 0 10px 18px -6px rgba(0,0,0,0.2);
     }
-
     .left-panel .signup-action-btn:hover {
       background: #f0f7ff;
       color: #022b5c;
     }
+    .left-panel .signup-action-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
 
-    /* SECURITY HINT */
     .security-hint {
       font-size: 0.85rem;
       color: rgba(255, 255, 255, 0.7);
@@ -315,27 +298,23 @@
       text-align: center;
       padding: 20px 0;
     }
-
     .sidebar-login-prompt .icon-large {
       font-size: 4rem;
       color: #03448a;
       margin-bottom: 24px;
       opacity: 0.75;
     }
-
     .sidebar-login-prompt h3 {
       font-size: 1.9rem;
       margin-bottom: 12px;
       color: #0b2b4a;
       font-weight: 700;
     }
-
     .sidebar-login-prompt p {
       color: #3a5670;
       margin-bottom: 32px;
       font-size: 1.1rem;
     }
-
     .btn-login-switch {
       background: transparent;
       border: 2px solid #03448a;
@@ -351,32 +330,10 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      backdrop-filter: blur(8px);
     }
-
     .btn-login-switch:hover {
       background: #03448a;
       color: white;
-      box-shadow: 0 10px 20px -5px rgba(3,68,138,0.3);
-    }
-
-    /* UTILITY */
-    .hidden {
-      display: none !important;
-    }
-
-    .left-panel {
-      overflow-y: auto;
-      max-height: 680px;
-    }
-
-    /* scrollbar beauty */
-    .left-panel::-webkit-scrollbar {
-      width: 4px;
-    }
-    .left-panel::-webkit-scrollbar-thumb {
-      background: rgba(255,255,255,0.3);
-      border-radius: 10px;
     }
 
     /* Flash messages */
@@ -403,7 +360,6 @@
       border-left: 4px solid #c62828;
     }
 
-    /* subtle footer */
     .secure-badge {
       margin-top: 30px;
       text-align: center;
@@ -415,20 +371,70 @@
       gap: 6px;
     }
 
-    /* responsiveness */
-    @media (max-width: 720px) {
-      .container { flex-direction: column; border-radius: 28px; }
-      .left-panel, .right-panel { width: 100%; }
+    /* RESPONSIVE – logo scales naturally */
+    @media (max-width: 900px) {
+      .container {
+        flex-direction: column;
+        max-width: 100%;
+      }
+      .left-panel, .right-panel {
+        width: 100%;
+        padding: 40px 24px;
+      }
+      .left-panel {
+        border-radius: 28px 28px 0 0;
+        text-align: center;
+      }
+      .right-panel {
+        border-radius: 0 0 28px 28px;
+        border-left: none;
+      }
+      .left-panel h2 {
+        font-size: 1.8rem;
+      }
+      .right-panel h2 {
+        font-size: 1.6rem;
+      }
+      .neoclass-logo {
+        width: 110px;
+      }
+      .logo {
+        height: 100px;
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+      .left-panel h2 {
+        font-size: 1.5rem;
+      }
+      .right-panel h2 {
+        font-size: 1.4rem;
+      }
+      .btn-signup-toggle {
+        padding: 10px 20px;
+        font-size: 0.9rem;
+      }
+      .neoclass-logo {
+        width: 90px;
+      }
+    }
+
+    .hidden {
+      display: none !important;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <!-- LEFT PANEL — dynamic content -->
+  <!-- LEFT PANEL – with plain Neo‑Class logo (no circle) -->
   <div class="left-panel" id="leftPanel">
-    <!-- DEFAULT: welcome + sign-up CTA -->
     <div id="leftDefaultContent">
-      <h2>Welcome to<br>Neo-Class</h2>
+      <img src="{{ url_for('static', filename='neoclass.png') }}" alt="Neo‑Class" class="neoclass-logo">
+      <h2>Welcome to Neo‑Class</h2>
       <p>Unlock advanced analytics.<br>Sign in to continue your journey.</p>
       <button class="btn-signup-toggle" id="showSignUpBtn">
         <i class="fas fa-user-plus"></i> Create account
@@ -438,10 +444,9 @@
       </div>
     </div>
 
-    <!-- SIGN-UP VIEW (left panel form) -->
     <div id="leftSignUpContent" class="signup-form-container hidden">
       <div class="signup-title">Get started</div>
-      <form method="POST" action="{{ url_for('admin_signup') }}">
+      <form id="signupForm" method="POST" action="{{ url_for('admin_signup') }}">
         <div class="input-group">
           <input type="text" name="username" placeholder="Username" required>
           <i class="fas fa-user"></i>
@@ -465,26 +470,21 @@
         <div class="security-hint">
           <i class="fas fa-lock"></i> Admin‑provided code required
         </div>
-        <button type="submit" class="signup-action-btn">
+        <button type="submit" class="signup-action-btn" id="registerBtn">
           <i class="fas fa-check-circle"></i> Register
         </button>
       </form>
     </div>
   </div>
 
-  <!-- RIGHT PANEL — dynamic -->
+  <!-- RIGHT PANEL – dynamic (school logo with circular background) -->
   <div class="right-panel" id="rightPanel">
-    <!-- DEFAULT: Admin login (with original funda logo) -->
     <div id="rightDefaultContent">
       <div class="logo">
-        <div class="logo-wrapper">
-          <img src="{{ url_for('static', filename='funda.png'  ) }}" alt="School Logo">
-          <span class="logo-text"></span>
-        </div>
+        <img src="{{ url_for('static', filename='funda.png') }}" alt="School Logo">
       </div>
       <h2>Admin access</h2>
 
-      <!-- Flash messages -->
       {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
           {% for category, message in messages %}
@@ -519,7 +519,6 @@
       </div>
     </div>
 
-    <!-- SIGN-UP STATE: right panel becomes "sidebar prompt" -->
     <div id="rightSignUpContent" class="hidden">
       <div class="sidebar-login-prompt">
         <div class="icon-large">
@@ -540,23 +539,19 @@
 
 <script>
   (function() {
-    "use strict";
-
-    // DOM refs
     const leftDefault = document.getElementById('leftDefaultContent');
     const leftSignUp = document.getElementById('leftSignUpContent');
     const rightDefault = document.getElementById('rightDefaultContent');
     const rightSignUp = document.getElementById('rightSignUpContent');
-
     const showSignUpBtn = document.getElementById('showSignUpBtn');
     const switchToLoginBtn = document.getElementById('switchToLoginBtn');
+    const signupForm = document.getElementById('signupForm');
+    const registerBtn = document.getElementById('registerBtn');
 
-    // ----- PASSWORD TOGGLE (robust) -----
     function setupPasswordToggle(toggleIcon, passwordField) {
       if (!toggleIcon || !passwordField) return;
       const newIcon = toggleIcon.cloneNode(true);
       toggleIcon.parentNode.replaceChild(newIcon, toggleIcon);
-      
       newIcon.addEventListener('click', (e) => {
         e.stopPropagation();
         const isPassword = passwordField.getAttribute('type') === 'password';
@@ -564,10 +559,8 @@
         newIcon.classList.toggle('fa-eye', !isPassword);
         newIcon.classList.toggle('fa-eye-slash', isPassword);
       });
-      return newIcon;
     }
 
-    // Login toggle init
     let loginToggle = document.getElementById('toggleLoginPassword');
     let loginPass = document.getElementById('loginPassword');
     if (loginToggle && loginPass) setupPasswordToggle(loginToggle, loginPass);
@@ -578,7 +571,6 @@
       if (signupToggle && signupPass) setupPasswordToggle(signupToggle, signupPass);
     }
 
-    // ----- VIEW SWITCHING -----
     function showSignUpView() {
       leftDefault.classList.add('hidden');
       leftSignUp.classList.remove('hidden');
@@ -592,18 +584,33 @@
       leftSignUp.classList.add('hidden');
       rightDefault.classList.remove('hidden');
       rightSignUp.classList.add('hidden');
-      
-      // re-bind login toggle
       const loginTog = document.getElementById('toggleLoginPassword');
       const loginPassField = document.getElementById('loginPassword');
       if (loginTog && loginPassField) setupPasswordToggle(loginTog, loginPassField);
     }
 
-    // Event listeners
-    showSignUpBtn?.addEventListener('click', showSignUpView);
-    switchToLoginBtn?.addEventListener('click', showLoginView);
+    // Prevent double submission on signup form
+    if (signupForm && registerBtn) {
+      signupForm.addEventListener('submit', function(e) {
+        if (registerBtn.disabled) {
+          e.preventDefault();
+          return false;
+        }
+        registerBtn.disabled = true;
+        // Optionally change text to show loading
+        const originalHTML = registerBtn.innerHTML;
+        registerBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Registering...';
+        // Re-enable button if there is a network error? Not possible easily with normal form submit.
+        // If the page reloads due to error, the button state is reset anyway.
+        // If we want to handle fetch, we'd need AJAX, but for normal form submit this is enough.
+        // The button will stay disabled until the page reloads/redirects.
+        // To re-enable on error, we'd need to listen for the page's unload? Not reliable.
+        // We'll keep it simple: disable on submit. If the submission fails (e.g., validation error), the page will reload with flash message, and the button will be re-enabled because the page reloads.
+      });
+    }
 
-    console.log('✅ Neo-Class — fully integrated with Flask backend.');
+    if (showSignUpBtn) showSignUpBtn.addEventListener('click', showSignUpView);
+    if (switchToLoginBtn) switchToLoginBtn.addEventListener('click', showLoginView);
   })();
 </script>
 </body>

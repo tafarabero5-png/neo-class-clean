@@ -2293,9 +2293,7 @@ def search():
 # ============================
 # TEACHERS MANAGEMENT TAB API ROUTES
 # ============================
-# ============================
-# TEACHERS MANAGEMENT TAB API ROUTES
-# ============================
+
 
 @app.route('/api/get-teachers')
 def get_teachers():
@@ -3298,117 +3296,124 @@ def get_class_subjects(class_id):
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
-    
+
 @app.route('/api/class-full-analytics')
 def class_full_analytics():
-    """Get full analytics for a specific class"""
+    """Get full analytics for a specific class – subject‑centric averages and pass rates.
+       Only subjects with marks contribute to class average and pass rate."""
     if 'admin' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
     class_name = request.args.get('class_name')
-    
+    term = session.get('term')
+
+    if not term:
+        return jsonify({'error': 'Term not selected'}), 400
+
     try:
         conn = get_database()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        
+
         # Get class info
         cursor.execute("SELECT id, name, description FROM classes WHERE name = %s", (class_name,))
         cls = cursor.fetchone()
-        
         if not cls:
             cursor.close()
             conn.close()
             return jsonify({'error': 'Class not found'}), 404
-        
         class_id = cls['id']
-        
-        # Get all students and their marks
+
+        # Total students
+        cursor.execute("SELECT COUNT(*) as cnt FROM students WHERE class_id = %s", (class_id,))
+        total_students = cursor.fetchone()['cnt']
+
+        # Get subjects for this class
         cursor.execute("""
-            SELECT s.id, s.firstname, s.surname
-            FROM students s
-            WHERE s.class_id = %s
-        """, (class_id,))
-        
-        students = cursor.fetchall()
-        total_students = len(students)
-        
-        # Calculate grade distribution and statistics
-        grade_distribution = {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0}
-        total_average = 0
-        pass_count = 0
-        
-        def calculate_grade(score):
-            if score >= 90:
-                return 'A'
-            elif score >= 80:
-                return 'B'
-            elif score >= 70:
-                return 'C'
-            elif score >= 60:
-                return 'D'
-            else:
-                return 'F'
-        
-        for student in students:
-            cursor.execute("""
-                SELECT AVG(score) as avg_score
-                FROM marks
-                WHERE student_id = %s
-            """, (student['id'],))
-            
-            result = cursor.fetchone()
-            avg = float(result['avg_score']) if (result and result['avg_score'] is not None) else 0
-            grade = calculate_grade(avg)
-            
-            grade_distribution[grade] += 1
-            total_average += avg
-            if grade in ['A', 'B', 'C']:
-                pass_count += 1
-        
-        class_average = total_average / total_students if total_students > 0 else 0
-        pass_rate = (pass_count / total_students * 100) if total_students > 0 else 0
-        
-        # Get subject performance - FIX: Include subject id in SELECT
-        cursor.execute("""
-            SELECT s.id, s.name, COUNT(DISTINCT m.student_id) as student_count,
-                   AVG(m.score) as average,
-                   MAX(m.score) as highest,
-                   MIN(m.score) as lowest
+            SELECT s.id, s.name
             FROM subjects s
-            LEFT JOIN marks m ON s.id = m.subject_id
-            LEFT JOIN students st ON m.student_id = st.id
-            WHERE s.id IN (SELECT subject_id FROM class_subjects WHERE class_id = %s)
-            GROUP BY s.id, s.name
+            JOIN class_subjects cs ON s.id = cs.subject_id
+            WHERE cs.class_id = %s
+            ORDER BY s.name
         """, (class_id,))
-        
         subjects = cursor.fetchall()
+
         subjects_data = []
-        
-        for subject in subjects:
-            subject_id = subject['id']  # Now this will work
-            
+        subject_averages = []      # only for subjects with marks
+        subject_pass_rates = []    # only for subjects with marks
+
+        for subj in subjects:
+            subject_id = subj['id']
             cursor.execute("""
-                SELECT COUNT(*) as pass_count
+                SELECT m.score
                 FROM marks m
-                WHERE m.subject_id = %s AND m.score >= 60
-            """, (subject_id,))
-            
-            pass_result = cursor.fetchone()
-            pass_rate_subject = (pass_result['pass_count'] / (subject['student_count'] or 1) * 100) if subject['student_count'] else 0
-            
+                JOIN students st ON m.student_id = st.id
+                WHERE m.subject_id = %s AND st.class_id = %s AND m.term = %s
+            """, (subject_id, class_id, term))
+            scores = [float(row['score']) for row in cursor.fetchall()]
+            count = len(scores)
+
+            if count == 0:
+                subjects_data.append({
+                    'name': subj['name'],
+                    'student_count': 0,
+                    'average': 0.0,
+                    'pass_rate': 0.0,
+                    'highest': 0.0,
+                    'lowest': 0.0,
+                    'grade_distribution': {'A+':0, 'A':0, 'B+':0, 'B':0, 'C':0, 'D':0, 'F':0}
+                })
+                # Do NOT append to subject_averages or subject_pass_rates – skip for overall calculations
+                continue
+
+            avg_score = sum(scores) / count
+            highest = max(scores)
+            lowest = min(scores)
+            passed = sum(1 for s in scores if s >= 50)
+            subject_pass_rate = (passed / count) * 100
+
+            # Grade distribution using your custom scale
+            grade_counts = {'A+':0, 'A':0, 'B+':0, 'B':0, 'C':0, 'D':0, 'F':0}
+            for score in scores:
+                if score >= 90:
+                    grade_counts['A+'] += 1
+                elif score >= 80:
+                    grade_counts['A'] += 1
+                elif score >= 70:
+                    grade_counts['B+'] += 1
+                elif score >= 60:
+                    grade_counts['B'] += 1
+                elif score >= 50:
+                    grade_counts['C'] += 1
+                elif score >= 40:
+                    grade_counts['D'] += 1
+                else:
+                    grade_counts['F'] += 1
+
             subjects_data.append({
-                'name': subject['name'],
-                'student_count': subject['student_count'] or 0,
-                'average': float(subject['average'] or 0),
-                'highest': float(subject['highest'] or 0),
-                'lowest': float(subject['lowest'] or 0),
-                'pass_rate': round(pass_rate_subject, 2)
+                'name': subj['name'],
+                'student_count': count,
+                'average': round(avg_score, 2),
+                'pass_rate': round(subject_pass_rate, 2),
+                'highest': round(highest, 2),
+                'lowest': round(lowest, 2),
+                'grade_distribution': grade_counts
             })
-        
+
+            subject_averages.append(avg_score)
+            subject_pass_rates.append(subject_pass_rate)
+
+        # Calculate overall class average (simple average of subject averages – only subjects with marks)
+        if subject_averages:
+            class_average = sum(subject_averages) / len(subject_averages)
+        else:
+            class_average = 0.0
+
+        # Calculate overall pass rate (average of subject pass rates – only subjects with marks)
+        pass_rate = sum(subject_pass_rates) / len(subject_pass_rates) if subject_pass_rates else 0.0
+
         cursor.close()
         conn.close()
-        
-        print(f"✅ Fetched full analytics for class: {class_name}")
+
         return jsonify({
             'class': {
                 'id': cls['id'],
@@ -3417,17 +3422,16 @@ def class_full_analytics():
                 'total_students': total_students,
                 'class_average': round(class_average, 2),
                 'pass_rate': round(pass_rate, 2),
-                'grade_distribution': grade_distribution,
                 'subjects': subjects_data
             }
         })
-    
+
     except Exception as e:
         print(f"❌ Error: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
-
+    
 @app.route('/api/add-class', methods=['POST'])
 def add_class():
     """Add a new class"""
@@ -3678,23 +3682,27 @@ def get_all_subjects():
     
 @app.route('/api/all-classes-analytics')
 def all_classes_analytics():
-    """Get analytics for all classes"""
+    """Get analytics for all classes, filtered by term, with overall class average as simple average of subject averages"""
     if 'admin' not in session:
         return jsonify({'error': 'Unauthorized'}), 401
-    
+
+    term = session.get('term')
+    if not term:
+        return jsonify({'error': 'Term not selected'}), 400
+
     try:
         conn = get_database()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        
+
         # Get all classes
         cursor.execute("SELECT id, name, description FROM classes ORDER BY name")
         classes = cursor.fetchall()
-        
+
         classes_data = []
-        
+
         for cls in classes:
             class_id = cls['id']
-            
+
             # Get subjects for this class
             cursor.execute("""
                 SELECT s.id, s.name
@@ -3703,12 +3711,12 @@ def all_classes_analytics():
                 WHERE cs.class_id = %s
                 ORDER BY s.name
             """, (class_id,))
-            
+
             subjects = cursor.fetchall()
-            
-            # Calculate statistics for each subject
+
             rows = []
-            
+            subject_averages = []  # for overall class average
+
             def calc_grade(score):
                 if score >= 90:
                     return 'A'
@@ -3720,30 +3728,39 @@ def all_classes_analytics():
                     return 'D'
                 else:
                     return 'F'
-            
+
             for subject in subjects:
                 subject_id = subject['id']
-                
-                # Get all marks for this subject in this class
+
+                # Get marks for this subject in this class for the selected term
                 cursor.execute("""
                     SELECT m.score
                     FROM marks m
                     JOIN students s ON m.student_id = s.id
-                    WHERE m.subject_id = %s AND s.class_id = %s
-                """, (subject_id, class_id))
-                
+                    WHERE m.subject_id = %s AND s.class_id = %s AND m.term = %s
+                """, (subject_id, class_id, term))
+
                 marks = cursor.fetchall()
-                
+
                 if marks:
                     scores = [m['score'] for m in marks]
                     avg = sum(scores) / len(scores)
-                    
-                    # Count grades
+                    subject_averages.append(avg)
+
+                    # Count grades using the custom scale (pass mark 50, but grade letters as defined)
                     grade_counts = {'A': 0, 'B': 0, 'C': 0, 'D': 0, 'F': 0}
                     for score in scores:
-                        grade = calc_grade(score)
-                        grade_counts[grade] += 1
-                    
+                        if score >= 90:
+                            grade_counts['A'] += 1
+                        elif score >= 80:
+                            grade_counts['B'] += 1
+                        elif score >= 70:
+                            grade_counts['C'] += 1
+                        elif score >= 60:
+                            grade_counts['D'] += 1
+                        else:
+                            grade_counts['F'] += 1
+
                     rows.append({
                         'subject': subject['name'],
                         'students': len(scores),
@@ -3754,44 +3771,27 @@ def all_classes_analytics():
                         'average': round(avg, 2),
                         'grade': calc_grade(avg)
                     })
-            
-            # Get all students to calculate class average
-            cursor.execute("""
-                SELECT COUNT(*) as count
-                FROM students
-                WHERE class_id = %s
-            """, (class_id,))
-            
-            result = cursor.fetchone()
-            total_students = result['count'] if result else 0
-            
-            # Calculate overall class average
-            cursor.execute("""
-                SELECT AVG(m.score) as avg
-                FROM marks m
-                JOIN students s ON m.student_id = s.id
-                WHERE s.class_id = %s
-            """, (class_id,))
-            
-            result = cursor.fetchone()
-            overall_avg = float(result['avg']) if (result and result['avg'] is not None) else 0.0
-            
-            print(f"Class: {cls['name']}, Overall Average: {overall_avg}, Type: {type(overall_avg)}")
-            
+
+            # Calculate overall class average as simple average of subject averages
+            if subject_averages:
+                overall_avg = sum(subject_averages) / len(subject_averages)
+            else:
+                overall_avg = 0.0
+
             classes_data.append({
                 'id': cls['id'],
                 'name': cls['name'],
                 'description': cls['description'] or '',
                 'rows': rows,
-                'overall': round(overall_avg, 2)  # Ensure it's always a float
+                'overall': round(overall_avg, 2)
             })
-        
+
         cursor.close()
         conn.close()
-        
+
         print(f"✅ Fetched analytics for {len(classes_data)} classes")
         return jsonify(classes_data)
-    
+
     except Exception as e:
         print(f"❌ Error in all_classes_analytics: {e}")
         import traceback

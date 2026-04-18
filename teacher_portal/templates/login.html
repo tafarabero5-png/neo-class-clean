@@ -1,63 +1,295 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Login</title>
-    <link rel="stylesheet" href="{{url_for('static',
-   filename='style.css') }}">
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Neo‑Class | Teacher Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, 'Inter', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f0f4fa 0%, #e2e8f0 100%);
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            background: #fff;
+            border-radius: 40px;
+            box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        /* LEFT PANEL – gradient with enhanced logo */
+        .left-panel {
+            background: linear-gradient(135deg, #03448a, #1e3a8a);
+            color: white;
+            padding: 48px 32px;
+            width: 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .left-panel .brand-logo {
+            width: 140px;
+            margin: 0 auto 28px auto;
+            filter: drop-shadow(0 10px 15px rgba(0, 0, 0, 0.2));
+            transition: transform 0.3s ease;
+        }
+        .left-panel .brand-logo:hover {
+            transform: scale(1.02);
+        }
+
+        .left-panel h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .left-panel p {
+            font-size: 1rem;
+            line-height: 1.5;
+            opacity: 0.9;
+            margin-bottom: 36px;
+        }
+
+        /* 🔐 ADMIN BUTTON — glassmorphism style (same as "Create account" on admin page) */
+.admin-container button {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+    color: white !important;
+    padding: 14px 28px !important;
+    font-size: 1.05rem !important;
+    font-weight: 600 !important;
+    border-radius: 60px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+.admin-container button:hover {
+    background: white !important;
+    color: #03448a !important;
+    border-color: white !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.2) !important;
+}
+
+.admin-container button i {
+    font-size: 1.2rem;
+    transition: transform 0.2s;
+}
+
+.admin-container button:hover i {
+    transform: translateX(3px);
+}
+
+        /* RIGHT PANEL – teacher login */
+        .right-panel {
+            background-color: #fff;
+            padding: 48px 40px;
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .right-panel .logo {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .right-panel .logo img {
+            height: 80px;
+            width: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.05));
+            transition: all 0.2s;
+        }
+        .right-panel .logo img:hover {
+            transform: scale(1.03);
+        }
+
+        .right-panel h2 {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 32px;
+        }
+
+        /* Input groups */
+        .input-group {
+            position: relative;
+            margin-bottom: 24px;
+        }
+        .input-group input {
+            width: 100%;
+            padding: 14px 45px 14px 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 60px;
+            font-size: 1rem;
+            background: #f9fafb;
+            transition: all 0.2s;
+        }
+        .input-group input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.15);
+        }
+        .input-group i {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        #togglePassword {
+            cursor: pointer;
+            color: #64748b;
+            z-index: 2;
+        }
+        #togglePassword:hover {
+            color: #3b82f6;
+        }
+
+        button[type="submit"] {
+            background: linear-gradient(95deg, #03448a, #1e3a8a);
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 6px 12px -6px rgba(0,0,0,0.2);
+        }
+        button[type="submit"]:hover {
+            background: linear-gradient(95deg, #1e3a8a, #03448a);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 18px -8px rgba(0,0,0,0.25);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                border-radius: 32px;
+                max-width: 500px;
+            }
+            .left-panel, .right-panel {
+                width: 100%;
+                padding: 40px 24px;
+            }
+            .left-panel {
+                border-radius: 32px 32px 0 0;
+            }
+            .right-panel {
+                border-radius: 0 0 32px 32px;
+            }
+            .left-panel h2 {
+                font-size: 1.6rem;
+            }
+            .right-panel h2 {
+                font-size: 1.6rem;
+            }
+            .left-panel .brand-logo {
+                width: 110px;
+            }
+            .right-panel .logo img {
+                height: 65px;
+            }
+            .admin-container button {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .left-panel .brand-logo {
+                width: 90px;
+            }
+            .right-panel .logo img {
+                height: 55px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="left-panel">
-        <h2>Welcome to Neo-Class</h2>
-        <p>Login to  analise student perfomance.</p>
-    
-     <div class="admin-container">
-      <form method="get" action="{{ url_for('admin_login') }}">
-  <button type="submit">Login As Admin??</button>
-  </form>
-  </div>
-      </div>
-      
+<div class="container">
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <img src="{{ url_for('static', filename='neoclass.png') }}" alt="Neo‑Class" class="brand-logo">
+        <h2>Welcome to Neo‑Class</h2>
+        <p>Analyse student performance, manage grades, and unlock insights.</p>
+        <div class="admin-container">
+            <form method="get" action="{{ url_for('admin_login') }}">
+                <button type="submit"><i class="fas fa-user-shield"></i> Login As Admin</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- RIGHT PANEL: Teacher login -->
     <div class="right-panel">
         <div class="logo">
-    <img src="{{url_for('static',filename='funda.png')}}" alt="Logo" class="logo">
-  </div>
-     <h2>Teacher Login</h2>
-    <form method="POST">
-        <div class="input-group">
-            <input type="text" name="username" placeholder="Username" required>
-            <i class="fas fa-user"></i>
+            <img src="{{ url_for('static', filename='funda.png') }}" alt="Teacher Portal">
         </div>
-
-        <div class="input-group password-group">
-            <input type="password" name="password" id="password" placeholder="Password" required>
-            <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
-        </div>
-
-        <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
-    </form>
-    </div>    
-</form>
+        <h2>Teacher Login</h2>
+        <form method="POST">
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Username" required>
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="input-group">
+                <input type="password" name="password" id="password" placeholder="Password" required>
+                <i class="fas fa-eye" id="togglePassword" onclick="togglePasswordVisibility()"></i>
+            </div>
+            <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
+        </form>
     </div>
 </div>
 
 <script>
     function togglePasswordVisibility() {
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.getElementById('togglePassword');
-
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
+        const pwd = document.getElementById('password');
+        const icon = document.getElementById('togglePassword');
+        if (pwd.type === 'password') {
+            pwd.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
         } else {
-            passwordInput.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
+            pwd.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
         }
     }
 </script>
-  
-    
 </body>
 </html>
