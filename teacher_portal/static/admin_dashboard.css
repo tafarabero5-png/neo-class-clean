@@ -16,22 +16,35 @@ body {
 }
 
 /* Sidebar */
+/* Sidebar */
 .sidebar {
   width: 240px;
   background: #1e3a8a;
   color: #fff;
   padding: 20px;
+  box-sizing: border-box;
 }
 
+/* Logo container – exactly 240px wide, no extra spacing */
 .sidebar .logo {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 40px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  margin: -20px -20px 30px -20px;   /* Extends to edges */
+  padding: 0;
+  width: 240px;                     /* Matches sidebar exactly */
+  height: 75px;                    /* Adjust this to control zoom level */
+  background-image: url("/static/neoclass.png");
+  background-size: cover;           /* Zooms in to fill the box */
+  background-position: center;
+  background-repeat: no-repeat;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15));
+  transition: filter 0.25s ease;
 }
 
+.sidebar .logo:hover {
+  filter: brightness(1.05) drop-shadow(0 6px 12px rgba(0, 0, 0, 0.2));
+}
+
+/* Rest of sidebar unchanged */
 .sidebar nav a {
   display: flex;
   align-items: center;
@@ -54,7 +67,192 @@ body {
   background: #3749b3;
   color: #fff;
 }
+/* =============================================
+   🌟 WORLD-CLASS ENHANCEMENTS – BEYOND LEGENDARY
+   ============================================= */
 
+:root {
+  --sidebar-bg: #1e3a8a;
+  --sidebar-accent: #3749b3;
+  --sidebar-glow: rgba(255, 255, 255, 0.15);
+  --transition-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Glass overlay on logo for premium reflection effect */
+.sidebar .logo {
+  position: relative;
+  isolation: isolate;
+}
+
+.sidebar .logo::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: skewX(-20deg);
+  animation: shine 6s infinite ease-in-out;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20%, 100% { left: 150%; }
+}
+
+/* Legendary menu items – animated underline + glow */
+.sidebar nav a {
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(0);
+  transition: all 0.3s var(--transition-smooth);
+  border-left: 3px solid transparent;
+  padding-left: 7px; /* compensates for border */
+}
+
+.sidebar nav a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 20% 50%, var(--sidebar-glow), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.sidebar nav a:hover::before {
+  opacity: 1;
+}
+
+.sidebar nav a i {
+  transition: transform 0.2s var(--transition-smooth);
+}
+
+.sidebar nav a:hover i {
+  transform: translateX(3px) scale(1.1);
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
+}
+
+/* Active state – luminous border and subtle pulse */
+.sidebar nav a.active {
+  background: linear-gradient(90deg, #2a4494, #3749b3);
+  border-left-color: #60a5fa;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  animation: activePulse 3s infinite;
+}
+
+@keyframes activePulse {
+  0%, 100% { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05); }
+  50% { box-shadow: 0 6px 16px rgba(96, 165, 250, 0.3), inset 0 0 0 1px rgba(255, 255, 255, 0.1); }
+}
+
+/* Staggered hover reveal for menu items */
+.sidebar nav a:nth-child(1) { transition-delay: 0s; }
+.sidebar nav a:nth-child(2) { transition-delay: 0.02s; }
+.sidebar nav a:nth-child(3) { transition-delay: 0.04s; }
+.sidebar nav a:nth-child(4) { transition-delay: 0.06s; }
+.sidebar nav a:nth-child(5) { transition-delay: 0.08s; }
+.sidebar nav a:nth-child(6) { transition-delay: 0.10s; }
+.sidebar nav a:nth-child(7) { transition-delay: 0.12s; }
+.sidebar nav a:nth-child(8) { transition-delay: 0.14s; }
+
+/* Scrollbar styling – invisible until hover, then sleek */
+.sidebar {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #4f6eb3 #1a2e6b;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #1a2e6b;
+  border-radius: 10px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: #4f6eb3;
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #60a5fa;
+}
+
+/* Logout button – distinct, with micro-interaction */
+.sidebar .sidebar-logout {
+  margin-top: auto;          /* 👈 THIS pushes it to the bottom */
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sidebar .sidebar-logout a {
+  display: flex;
+  align-items: center;
+  padding: 12px 10px;
+  color: #f87171;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.25s var(--transition-smooth);
+  background: rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.sidebar .sidebar-logout a i {
+  margin-right: 10px;
+  width: 20px;
+  transition: transform 0.2s;
+}
+
+.sidebar .sidebar-logout a:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+}
+
+.sidebar .sidebar-logout a:hover i {
+  transform: translateX(3px);
+}
+
+/* Optional: subtle floating effect for the whole sidebar */
+.sidebar {
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.3), inset -1px 0 0 rgba(255, 255, 255, 0.05);
+  transition: box-shadow 0.4s ease;
+}
+
+.sidebar:hover {
+  box-shadow: 12px 0 40px rgba(0, 0, 0, 0.4), inset -1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Responsive touch – smooth font scaling */
+@media (max-width: 768px) {
+  .sidebar nav a span {
+    font-size: 13px;
+  }
+}
+
+
+/* Focus states for accessibility */
+.sidebar nav a:focus-visible {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
 /* Main */
 .main {
   flex: 1;
@@ -119,27 +317,7 @@ body {
 }
 
 
-/* SIDEBAR LOGOUT BUTTON */
-.sidebar-logout a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
-    margin-top: auto;
-    color: #fca5a5;
-    text-decoration: none;
-    border-radius: 6px;
-    transition: 0.3s;
-}
 
-.sidebar-logout a i {
-    font-size: 16px;
-}
-
-.sidebar-logout a:hover {
-    background: #7f1d1d;
-    color: white;
-}
 .analytics select {
     padding: 10px;
     margin-bottom: 20px;

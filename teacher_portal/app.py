@@ -3797,7 +3797,61 @@ def all_classes_analytics():
         import traceback
         traceback.print_exc()
         return jsonify({'error': str(e)}), 500
+    
+@app.route('/api/add-subject', methods=['POST'])
+def add_subject():
+    """Add a new subject (admin only)"""
+    if 'admin' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized'}), 401
 
+    try:
+        data = request.get_json()
+        subject_name = data.get('name', '').strip()
+
+        if not subject_name:
+            return jsonify({'success': False, 'message': 'Subject name is required'}), 400
+
+        conn = get_database()
+        cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+        # 1. Check for duplicate name
+        cursor.execute("SELECT id FROM subjects WHERE LOWER(name) = LOWER(%s)", (subject_name,))
+        existing = cursor.fetchone()
+        if existing:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'message': 'Subject already exists'}), 400
+
+        # 2. Attempt to insert
+        try:
+            cursor.execute("INSERT INTO subjects (name) VALUES (%s) RETURNING id", (subject_name,))
+            new_id = cursor.fetchone()['id']
+            conn.commit()
+        except psycopg2.errors.UniqueViolation as e:
+            # If it's a primary key violation, reset the sequence and retry once
+            conn.rollback()
+            print(f"⚠️ Sequence conflict for subjects.id, resetting sequence...")
+            cursor.execute("SELECT setval('subjects_id_seq', (SELECT MAX(id) FROM subjects));")
+            cursor.execute("INSERT INTO subjects (name) VALUES (%s) RETURNING id", (subject_name,))
+            new_id = cursor.fetchone()['id']
+            conn.commit()
+            print(f"✅ Sequence reset and subject inserted with id {new_id}")
+
+        cursor.close()
+        conn.close()
+
+        return jsonify({
+            'success': True,
+            'message': f'Subject "{subject_name}" created',
+            'subject': {'id': new_id, 'name': subject_name}
+        }), 201
+
+    except Exception as e:
+        print(f"❌ Error adding subject: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': 'Database error: ' + str(e)}), 500
+    
 @app.route('/api/filter-activity-log', methods=['POST'])
 def filter_activity_log():
     """Filter activity logs by type and date range"""

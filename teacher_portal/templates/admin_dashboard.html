@@ -12,10 +12,8 @@
 <div class="app">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="logo">
-        <i class="fas fa-school"></i>
-        <span>Neo-Class</span>
-    </div>
+    <div class="logo"></div>
+    
 
     <nav class="menu">
       <a onclick="switchTab('dashboard')" style="cursor:pointer;">
@@ -1166,7 +1164,7 @@
     
     <div class="modal-body">
       <form id="addClassForm" onsubmit="submitAddClass(event)">
-        <!-- Class Name -->
+        <!-- Class Information -->
         <div class="form-section">
           <h3 class="form-section-title">Class Information</h3>
           
@@ -1192,6 +1190,18 @@
           </div>
         </div>
 
+        <!-- ➕ Add New Subject (Inline) -->
+        <div class="form-section" style="background: #f3f4f6; border-radius: 8px; padding: 12px; margin-top: 0;">
+          <h3 class="form-section-title" style="margin-bottom: 8px;">➕ Add New Subject</h3>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="newSubjectNameInputAdd" placeholder="e.g., Physics, Chemistry..." style="flex: 1; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px;">
+            <button type="button" onclick="addSubjectFromAddModal(event)" style="padding: 10px 16px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.2s;">
+              <i class="fas fa-plus"></i> Add
+            </button>
+          </div>
+          <p style="font-size: 11px; color: #6b7280; margin-top: 6px; margin-bottom: 0;">New subject will be automatically selected for this class.</p>
+        </div>
+
         <!-- Form Actions -->
         <div class="modal-buttons">
           <button type="submit" class="btn-primary">
@@ -1205,6 +1215,7 @@
     </div>
   </div>
 </div>
+
 <!-- Full Analytics Modal -->
 <div id="fullAnalyticsModal" class="modal" style="display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); overflow-y: auto;">
   <div class="modal-content" style="background-color: white; margin: 3% auto; padding: 0; border-radius: 12px; width: 95%; max-width: 1000px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);">
@@ -3263,13 +3274,13 @@ function getGradeColor(grade) {
 }
 
 // ============================
-// EDIT CLASS MODAL
+// EDIT CLASS MODAL (Enhanced)
 // ============================
 
 function editClass(classId) {
   const modal = document.getElementById('editClassModal');
   const content = document.getElementById('editClassContent');
-  
+
   content.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="fas fa-spinner fa-spin"></i> Loading class data...</div>';
   modal.style.display = 'block';
 
@@ -3299,9 +3310,21 @@ function editClass(classId) {
 
             <div style="margin-bottom: 20px;">
               <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 10px;">📚 Subjects *</label>
-              <div id="editClassSubjectsCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; max-height: 250px; overflow-y: auto; padding: 10px; background: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
+              <div id="editClassSubjectsCheckboxes" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; max-height: 200px; overflow-y: auto; padding: 10px; background: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
                 <p>Loading subjects...</p>
               </div>
+            </div>
+
+            <!-- ➕ Add New Subject (Inline) -->
+            <div style="margin-bottom: 20px; padding: 12px; background: #f3f4f6; border-radius: 8px;">
+              <label style="display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 8px;">➕ Add New Subject</label>
+              <div style="display: flex; gap: 8px;">
+                <input type="text" id="newSubjectNameInput" placeholder="e.g., Physics, Chemistry..." style="flex: 1; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px;">
+                <button type="button" onclick="addSubjectFromEditModal(event, ${classId})" style="padding: 10px 16px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; white-space: nowrap; transition: all 0.2s;">
+                  <i class="fas fa-plus"></i> Add
+                </button>
+              </div>
+              <p style="font-size: 11px; color: #6b7280; margin-top: 6px; margin-bottom: 0;">New subject will be automatically added to this class.</p>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 25px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
@@ -3324,20 +3347,26 @@ function editClass(classId) {
     });
 }
 
-function loadEditClassSubjects(classId, currentSubjects) {
+function loadEditClassSubjects(classId, currentSubjects, newlyAddedSubjectId = null) {
   fetch('/api/get-all-subjects')
     .then(res => res.json())
     .then(data => {
       const container = document.getElementById('editClassSubjectsCheckboxes');
-      
+
       if (!data.subjects || data.subjects.length === 0) {
         container.innerHTML = '<p style="color: #ef4444;">No subjects available</p>';
         return;
       }
 
+      // If a new subject was just added, ensure it's in the currentSubjects list
+      let subjectsToCheck = [...currentSubjects];
+      if (newlyAddedSubjectId && !subjectsToCheck.includes(newlyAddedSubjectId)) {
+        subjectsToCheck.push(newlyAddedSubjectId);
+      }
+
       container.innerHTML = data.subjects.map(subject => `
         <label style="display: flex; align-items: center; gap: 8px; padding: 10px; background: white; border-radius: 6px; border: 1px solid #e5e7eb; cursor: pointer; transition: all 0.2s;">
-          <input type="checkbox" value="${subject.id}" name="edit_class_subjects" ${currentSubjects.includes(subject.id) ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: #4f46e5;">
+          <input type="checkbox" value="${subject.id}" name="edit_class_subjects" ${subjectsToCheck.includes(subject.id) ? 'checked' : ''} style="cursor: pointer; width: 16px; height: 16px; accent-color: #4f46e5;">
           <span style="font-size: 13px; color: #374151; font-weight: 500;">${subject.name}</span>
         </label>
       `).join('');
@@ -3348,12 +3377,58 @@ function loadEditClassSubjects(classId, currentSubjects) {
     });
 }
 
+// ➕ New function: Add subject from inside the edit modal
+function addSubjectFromEditModal(event, classId) {
+  event.preventDefault(); // Prevent any default button behavior
+  const input = document.getElementById('newSubjectNameInput');
+  const subjectName = input.value.trim();
+
+  if (!subjectName) {
+    showNotification('❌ Please enter a subject name', 'error');
+    return;
+  }
+
+  const addBtn = event.currentTarget; // Get the button that triggered the event
+  addBtn.disabled = true;
+  addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+  fetch('/api/add-subject', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: subjectName })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showNotification(`✓ Subject "${subjectName}" added!`, 'success');
+        input.value = ''; // Clear input
+
+        // Refresh the subjects list, passing the new subject ID to auto-check it
+        const currentChecked = Array.from(
+          document.querySelectorAll('input[name="edit_class_subjects"]:checked')
+        ).map(cb => parseInt(cb.value));
+
+        loadEditClassSubjects(classId, currentChecked, data.subject.id);
+      } else {
+        showNotification(`❌ ${data.message}`, 'error');
+      }
+    })
+    .catch(err => {
+      console.error('Error adding subject:', err);
+      showNotification('❌ Failed to add subject', 'error');
+    })
+    .finally(() => {
+      addBtn.disabled = false;
+      addBtn.innerHTML = '<i class="fas fa-plus"></i> Add';
+    });
+}
+
 function submitEditClass(event, classId) {
   event.preventDefault();
 
   const className = document.getElementById('editClassName').value.trim();
   const classDescription = document.getElementById('editClassDescription').value.trim();
-  
+
   const selectedSubjects = Array.from(
     document.querySelectorAll('input[name="edit_class_subjects"]:checked')
   ).map(cb => parseInt(cb.value));
@@ -3404,6 +3479,8 @@ function submitEditClass(event, classId) {
 function closeEditClassModal() {
   document.getElementById('editClassModal').style.display = 'none';
 }
+
+
 
 // ============================
 // DELETE CLASS WITH CONFIRMATION
@@ -3469,7 +3546,7 @@ function closeDeleteClassConfirmModal() {
 }
 
 // ============================
-// ADD CLASS MODAL FUNCTIONS
+// ADD CLASS MODAL FUNCTIONS (Enhanced)
 // ============================
 
 function openAddClassModal() {
@@ -3491,15 +3568,14 @@ function resetClassForm() {
   
   const container = document.getElementById('classSubjectsCheckboxes');
   if (container) {
-    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-    checkboxes.forEach(checkbox => {
-      checkbox.checked = false;
-    });
-    container.innerHTML = '';
+    container.innerHTML = ''; // Clear completely
   }
+
+  const newSubjectInput = document.getElementById('newSubjectNameInputAdd');
+  if (newSubjectInput) newSubjectInput.value = '';
 }
 
-function loadAvailableSubjects() {
+function loadAvailableSubjects(newlyAddedSubjectId = null) {
   fetch('/api/get-all-subjects')
     .then(res => res.json())
     .then(data => {
@@ -3510,6 +3586,12 @@ function loadAvailableSubjects() {
         return;
       }
 
+      // If a new subject was just added, pre-check it
+      let autoCheckIds = [];
+      if (newlyAddedSubjectId) {
+        autoCheckIds.push(newlyAddedSubjectId);
+      }
+
       container.innerHTML = data.subjects.map(subject => `
         <div class="subject-checkbox-class">
           <input 
@@ -3518,6 +3600,7 @@ function loadAvailableSubjects() {
             value="${subject.id}" 
             name="class_subjects"
             class="class-subject-input"
+            ${autoCheckIds.includes(subject.id) ? 'checked' : ''}
           >
           <label for="class_subject_${subject.id}" style="font-weight: 500; color: #374151; cursor: pointer;">
             ${subject.name}
@@ -3528,6 +3611,48 @@ function loadAvailableSubjects() {
     .catch(err => {
       console.error('Error loading subjects:', err);
       document.getElementById('classSubjectsCheckboxes').innerHTML = '<p style="color: red;">Error loading subjects</p>';
+    });
+}
+
+// ➕ New function: Add subject from inside the add modal
+function addSubjectFromAddModal(event) {
+  event.preventDefault(); // Prevent any default button behavior
+  const input = document.getElementById('newSubjectNameInputAdd');
+  const subjectName = input.value.trim();
+
+  if (!subjectName) {
+    showNotification('❌ Please enter a subject name', 'error');
+    return;
+  }
+
+  const addBtn = event.currentTarget;
+  addBtn.disabled = true;
+  addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding...';
+
+  fetch('/api/add-subject', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: subjectName })
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        showNotification(`✓ Subject "${subjectName}" added!`, 'success');
+        input.value = ''; // Clear input
+
+        // Refresh the subjects list, auto-checking the new subject
+        loadAvailableSubjects(data.subject.id);
+      } else {
+        showNotification(`❌ ${data.message}`, 'error');
+      }
+    })
+    .catch(err => {
+      console.error('Error adding subject:', err);
+      showNotification('❌ Failed to add subject', 'error');
+    })
+    .finally(() => {
+      addBtn.disabled = false;
+      addBtn.innerHTML = '<i class="fas fa-plus"></i> Add';
     });
 }
 
@@ -3570,7 +3695,7 @@ function submitAddClass(event) {
       closeAddClassModal();
       openClassAnalytics();
     } else {
-      showNotification('❌ Error adding class: ' + data.message, 'error');
+      showNotification(`❌ ${data.message}`, 'error');
     }
   })
   .catch(err => {
