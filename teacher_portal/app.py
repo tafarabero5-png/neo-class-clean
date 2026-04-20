@@ -544,191 +544,114 @@ def debug_teacher_data():
 
 #returning back to the  login page
 @app.route('/marks_success/<int:subject_id>/<int:class_id>/<term>')
-def mark_success(subject_id,class_id,term):
-     conn=get_database()
-     cursor=conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-     #suject name
-     cursor.execute("select name from  subjects  where id =%s ",(subject_id,))
-     subject=cursor.fetchone()
-     subject_name=subject['name'] if subject else "unknown"
-     #class name
-     cursor.execute("select name from classes where id=%s",(class_id,))
-     classes=cursor.fetchone()
-     class_name=classes['name'] if classes else "unknown class"
-                    
-     
-    #total students who do that subject
-     cursor.execute("""
-    SELECT COUNT(DISTINCT m.student_id)
-    FROM marks m
-    JOIN students s ON s.id = m.student_id
-    WHERE m.subject_id = %s AND s.class_id = %s AND m.term = %s
-""", (subject_id, class_id, term))
-     total_students=cursor.fetchone()[0]
-     # Top performer (based on highest mark)
-     cursor.execute("""
-        SELECT s.firstname || ' ' || s.surname AS name, MAX(m.score) as max_score
+def mark_success(subject_id, class_id, term):
+    conn = get_database()
+    cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+
+    # Fetch all marks for this subject/class/term in one query
+    cursor.execute("""
+        SELECT 
+            s.id AS student_id,
+            s.firstname || ' ' || s.surname AS student_name,
+            m.score
         FROM marks m
         JOIN students s ON s.id = m.student_id
-                    where m.subject_id=%s AND s.class_id = %s AND m.term = %s
-        GROUP BY s.firstname, s.surname
+        WHERE m.subject_id = %s AND s.class_id = %s AND m.term = %s
+        ORDER BY m.score DESC
+    """, (subject_id, class_id, term))
+    rows = cursor.fetchall()
 
-        ORDER BY  max_score DESC
-        LIMIT 1;
-                    """,(subject_id,class_id,term))
-     top_performer = cursor.fetchone()
-     #passrate for the subject
-     cursor.execute("""
-    SELECT ROUND(
-        COUNT(*) FILTER (WHERE m.score >= 50)::numeric 
-        / NULLIF(COUNT(*), 0) * 100, 2
-    ) AS pass_rate
-    FROM marks m
-    JOIN students s ON s.id = m.student_id
-    WHERE m.subject_id = %s AND s.class_id = %s AND m.term = %s
-""", (subject_id, class_id, term))
+    # Get subject and class names
+    cursor.execute("SELECT name FROM subjects WHERE id = %s", (subject_id,))
+    subject = cursor.fetchone()
+    subject_name = subject['name'] if subject else "Unknown Subject"
+    cursor.execute("SELECT name FROM classes WHERE id = %s", (class_id,))
+    class_row = cursor.fetchone()
+    class_name = class_row['name'] if class_row else "Unknown Class"
 
+    cursor.close()
+    conn.close()
 
-     pass_rate = cursor.fetchone()['pass_rate']
+    if not rows:
+        return render_template('marks_success_empty.html',
+                               subject_name=subject_name,
+                               class_name=class_name,
+                               term=term)
 
-     #top 5 students
-     cursor.execute("""
-                    select s.firstname || ' ' || s.surname AS name,m.student_id,m.score 
-                    from marks m
-                    join students s on s.id=m.student_id
-                    where m.subject_id=%s AND s.class_id = %s AND m.term = %s
-                    order by m.score desc
-                    limit 5
-                    """,(subject_id,class_id,term))
-     top_5=cursor.fetchall()
-     #bottom 5 students
-     cursor.execute(""" select s.firstname || ' ' || s.surname AS name,m.student_id,m.score
-                    from marks m
-                    join students s on s.id=m.student_id
-                    where m.subject_id=%s AND s.class_id = %s AND m.term = %s
-                    order by m.score asc
-                    limit 5
-""",(subject_id,class_id,term))
-     bottom_5=cursor.fetchall()
+    # Extract data
+    student_ids = [r['student_id'] for r in rows]
+    student_names = [r['student_name'] for r in rows]
+    scores = [r['score'] for r in rows]
+    total_students = len(scores)
 
+    # All students list (for the full roster)
+    all_students = [
+        {'student_id': student_ids[i], 'name': student_names[i], 'score': scores[i]}
+        for i in range(total_students)
+    ]
 
+    # Basic stats
+    total_passed = sum(1 for s in scores if s >= 50)
+    total_failed = total_students - total_passed
+    pass_rate = round((total_passed / total_students) * 100, 2) if total_students else 0
+    overall_mean = round(sum(scores) / total_students, 2) if total_students else 0
 
+    # Top performer
+    top_performer = {'name': student_names[0], 'avg': scores[0]} if rows else None
 
+    # Top 5 and bottom 5
+    top_5 = [{'student_id': student_ids[i], 'name': student_names[i], 'score': scores[i]} for i in range(min(5, total_students))]
+    bottom_5 = [{'student_id': student_ids[-i-1], 'name': student_names[-i-1], 'score': scores[-i-1]} for i in range(min(5, total_students))]
 
-     #donout code
-     cursor.execute("""
-     SELECT
-        COUNT(*) FILTER (WHERE m.score >= 50) AS passed,
-        COUNT(*) FILTER (WHERE m.score < 50) AS failed
-     FROM marks m
-     JOIN students s ON s.id = m.student_id
-     WHERE m.subject_id = %s
-      AND s.class_id = %s
-      AND m.term = %s
-     """, (subject_id, class_id, term))
+    # Grade distribution (using your scale)
+    grade_ranges = {
+        'A': (75, 100),
+        'B': (65, 74),
+        'C': (50, 64),
+        'D': (40, 49),
+        'E': (30, 39),
+        'F': (0, 29)
+    }
+    grade_data = {symbol: {'count': 0, 'passed': 0, 'failed': 0, 'sum': 0} for symbol in grade_ranges}
+    for score in scores:
+        for symbol, (low, high) in grade_ranges.items():
+            if low <= score <= high:
+                grade_data[symbol]['count'] += 1
+                grade_data[symbol]['sum'] += score
+                if score >= 50:
+                    grade_data[symbol]['passed'] += 1
+                else:
+                    grade_data[symbol]['failed'] += 1
+                break
 
-     row = cursor.fetchone()
-     passed = row['passed'] or 0
-     failed = row['failed'] or 0
+    analytics = []
+    for symbol, data in grade_data.items():
+        if data['count'] > 0:
+            mean_mark = round(data['sum'] / data['count'], 2)
+            analytics.append({
+                'symbol': symbol,
+                'num_students': data['count'],
+                'passed': data['passed'],
+                'failed': data['failed'],
+                'mean': mean_mark
+            })
 
-
-
-
- # ANALYTICS FOR STUDENTS
-     cursor.execute("""
-    SELECT m.score
-    FROM marks m
-    JOIN students s ON s.id = m.student_id
-    WHERE m.subject_id = %s
-      AND s.class_id = %s
-      AND m.term = %s
-     """, (subject_id, class_id, term))
-
-     marks = [row['score'] for row in cursor.fetchall()] or []
-
-     total_student = len(marks)
-     overall_passed = sum(1 for m in marks if m >= 50)
-     overall_failed = sum(1 for m in marks if m < 50)
-
-     pass_rate = round(
-     (overall_passed / total_student) * 100, 2
-     ) if total_student else 0
-
-     
-     # GRADE DISTRIBUTION
-     
-     grades = {
-    'A': [],
-    'B': [],
-    'C': [],
-    'D': [],
-    'E': [],
-    'F': []
-     }
-     for score in marks:
-         if score >= 75:
-          grades['A'].append(score)
-         elif score >= 65:
-          grades['B'].append(score)
-         elif score >= 50:
-          grades['C'].append(score)
-         elif score >= 40:
-          grades['D'].append(score)
-         elif score >= 30:
-          grades['E'].append(score)
-         else:
-          grades['F'].append(score)
-
-
-# BUILDing ANALYTICS TABLE
-
-     analytics = []
-
-     for symbol, scores in grades.items():
-      total = len(scores)
-      passed = sum(1 for s in scores if s >= 50)
-      failed = sum(1 for s in scores if s < 50)
-      mean_mark = round(sum(scores) / total, 2) if total else 0
-
-      analytics.append({
-        'symbol': symbol,
-        'num_students': total,
-        'passed': passed,
-        'failed': failed,
-        'mean': mean_mark
-       })
-
-
-# OVERALL ANALYTICS
-
-     total_student = sum(a['num_students'] for a in analytics)
-     total_passed = sum(a['passed'] for a in analytics)
-     total_failed = sum(a['failed'] for a in analytics)
-
-     overall_mean = round(
-     sum(marks) / len(marks), 2
-     ) if marks else 0
-
-
-     return render_template(
-    'marks_success.html',
-    subject_name=subject_name,
-    class_name=class_name,
-    total_students=total_students,
-    total_student=total_student,
-    top_5=top_5,
-    bottom_5=bottom_5,
-    top_performer=top_performer,
-    pass_rate=pass_rate,
-    analytics=analytics,
-    overall_mean=overall_mean,
-    total_passed=total_passed,
-    total_failed=total_failed,
-    passed=passed,
-    failed=failed,
-    term=term
-)
-
+    return render_template(
+        'marks_success.html',
+        subject_name=subject_name,
+        class_name=class_name,
+        total_students=total_students,
+        pass_rate=pass_rate,
+        top_performer=top_performer,
+        top_5=top_5,
+        bottom_5=bottom_5,
+        analytics=analytics,
+        total_passed=total_passed,
+        total_failed=total_failed,
+        overall_mean=overall_mean,
+        term=term,
+        all_students=all_students   # ← NEW: pass full list
+    )
 
 
     
@@ -4058,8 +3981,9 @@ def delete_event(event_id):
         return jsonify({'success': False, 'message': str(e)}), 500
 
 # ============================
-# SECURITY LOCK API
+# SECURITY LOCK API (OPTIMISED)
 # ============================
+
 @app.route('/api/portal-status', methods=['GET'])
 def get_portal_status():
     if 'admin' not in session:
@@ -4067,17 +3991,19 @@ def get_portal_status():
     try:
         conn = get_database()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
+        # Fetch both portals in one query – already efficient
         cursor.execute("SELECT portal, is_locked, last_changed FROM portal_status")
         rows = cursor.fetchall()
-        cursor.close(); conn.close()
+        cursor.close()
+        conn.close()
         status = {'teacher_locked': True, 'student_locked': True}
         for row in rows:
             if row['portal'] == 'teacher':
                 status['teacher_locked'] = row['is_locked']
-                status['teacher_last_change'] = row['last_changed'].strftime('%Y-%m-%d %H:%M')
+                status['teacher_last_change'] = row['last_changed'].strftime('%Y-%m-%d %H:%M:%S')
             elif row['portal'] == 'student':
                 status['student_locked'] = row['is_locked']
-                status['student_last_change'] = row['last_changed'].strftime('%Y-%m-%d %H:%M')
+                status['student_last_change'] = row['last_changed'].strftime('%Y-%m-%d %H:%M:%S')
         return jsonify(status)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -4096,6 +4022,7 @@ def update_portal_status():
     try:
         conn = get_database()
         cursor = conn.cursor()
+        # Use a single transaction (already implied)
         cursor.execute("""
             INSERT INTO portal_status (portal, is_locked, last_changed, changed_by)
             VALUES (%s, %s, NOW(), %s)
@@ -4108,7 +4035,9 @@ def update_portal_status():
             INSERT INTO lock_history (portal, action, reason, performed_by)
             VALUES (%s, %s, %s, %s)
         """, (portal, action, reason, session.get('admin')))
-        conn.commit(); cursor.close(); conn.close()
+        conn.commit()
+        cursor.close()
+        conn.close()
         log_activity_internal(f'{portal}_portal_{action}', f'{portal} portal {action}ed', 'Success')
         return jsonify({'success': True})
     except Exception as e:
@@ -4121,13 +4050,20 @@ def lock_history():
     try:
         conn = get_database()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        cursor.execute("SELECT portal, action, reason, performed_by, timestamp FROM lock_history ORDER BY timestamp DESC LIMIT 20")
+        # Limit to last 50 records for speed (adjust as needed)
+        cursor.execute("""
+            SELECT portal, action, reason, performed_by, timestamp
+            FROM lock_history
+            ORDER BY timestamp DESC
+            LIMIT 50
+        """)
         history = cursor.fetchall()
-        cursor.close(); conn.close()
+        cursor.close()
+        conn.close()
         return jsonify({'history': [dict(h) for h in history]})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
+    
 # ============================
 # ACTIVITY LOG API
 # ============================

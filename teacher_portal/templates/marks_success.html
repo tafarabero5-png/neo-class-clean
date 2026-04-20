@@ -3,29 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Performance Dashboard · Neo‑Class</title>
+    <title>Neo‑Class · Performance Intelligence</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        /* ========================================= */
-        /* WORLD‑CLASS PERFORMANCE DASHBOARD */
-        /* ========================================= */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', 'Segoe UI', sans-serif; }
+        body { background: #f4f6fb; }
+        .dashboard { display: flex; min-height: 100vh; }
 
-        body {
-            background: #f4f6fb;
-        }
-
-        .dashboard {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ---------- SIDEBAR ---------- */
+        /* Sidebar – dark gradient with shine */
         .sidebar {
             width: 260px;
             background: linear-gradient(180deg, #0f172a, #1e293b);
@@ -33,326 +20,219 @@
             padding: 24px 16px;
             display: flex;
             flex-direction: column;
-            box-shadow: 5px 0 20px rgba(0,0,0,0.08);
+            box-shadow: 8px 0 30px rgba(0,0,0,0.3);
+            transition: box-shadow 0.4s ease;
+            overflow-y: auto;
         }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 32px;
-            padding-left: 8px;
+        .sidebar .logo {
+            margin: -24px -16px 30px -16px;
+            width: 260px;
+            height: 75px;
+            background-image: url("/static/neoclass.png");
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
         }
-
-        .logo i {
-            margin-right: 12px;
-            color: #3b82f6;
+        .sidebar .logo::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: skewX(-20deg);
+            animation: shine 6s infinite;
         }
+        @keyframes shine { 0% { left: -100%; } 20%,100% { left: 150%; } }
 
         .menu-title {
             font-size: 12px;
             letter-spacing: 1px;
             color: #94a3b8;
             margin-bottom: 16px;
-            padding-left: 8px;
             text-transform: uppercase;
-            font-weight: 600;
         }
-
-        .sidebar nav {
-            flex: 1;
-        }
-
-        .menu a {
+        .sidebar nav a {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 16px;
+            padding: 12px 16px;
             margin-bottom: 6px;
             color: #cbd5e1;
-            text-decoration: none;
             border-radius: 14px;
-            transition: all 0.2s;
             cursor: pointer;
+            transition: all 0.2s;
         }
-
-        .menu-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .menu a i {
-            font-size: 18px;
-            width: 24px;
-        }
-
-        .menu a .arrow {
-            font-size: 12px;
-            opacity: 0.5;
-        }
-
-        .menu a:hover,
-        .menu a.active {
-            background: rgba(59, 130, 246, 0.15);
+        .sidebar nav a:hover, .sidebar nav a.active {
+            background: linear-gradient(90deg, #2a3a6e, #1e2a5a);
+            border-left: 3px solid #60a5fa;
             color: white;
         }
-
-        .menu a:hover .arrow,
-        .menu a.active .arrow {
-            opacity: 1;
-        }
+        .menu-left { display: flex; align-items: center; gap: 12px; }
+        .arrow { font-size: 12px; opacity: 0.5; }
 
         .sidebar-logout {
             margin-top: auto;
             padding-top: 20px;
-            border-top: 1px solid #334155;
+            border-top: 1px solid rgba(255,255,255,0.08);
         }
-
         .sidebar-logout a {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 14px 16px;
-            color: #fca5a5;
+            padding: 12px 16px;
+            color: #f87171;
             text-decoration: none;
             border-radius: 14px;
-            transition: all 0.2s;
+            background: rgba(0,0,0,0.1);
         }
+        .sidebar-logout a:hover { background: rgba(239,68,68,0.2); color: #fecaca; }
 
-        .sidebar-logout a:hover {
-            background: #7f1d1d;
-            color: white;
-        }
-
-        /* ---------- MAIN CONTENT ---------- */
+        /* Main content */
         .main-content {
             flex: 1;
             padding: 28px 32px;
             overflow-y: auto;
         }
-
         .topbar {
             background: white;
             padding: 18px 24px;
             border-radius: 20px;
             margin-bottom: 28px;
-            box-shadow: 0 6px 14px rgba(0,0,0,0.03);
             display: flex;
-            align-items: center;
             justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
         }
-
-        .topbar h2 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #0f172a;
+        .topbar h2 { font-size: 24px; font-weight: 700; color: #0f172a; }
+        .action-buttons {
+            display: flex;
+            gap: 12px;
         }
-
-        /* Stats Cards */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .card {
-            position: relative;
-            padding: 22px 20px;
-            border-radius: 24px;
+        .action-buttons button {
+            background: #4f46e5;
             color: white;
-            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.15);
-            transition: transform 0.2s;
-            overflow: hidden;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-        }
-
-        .card-icon {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 32px;
-            opacity: 0.2;
-            color: white;
-        }
-
-        .card h4 {
-            font-size: 14px;
-            font-weight: 500;
-            opacity: 0.9;
-            margin-bottom: 8px;
-        }
-
-        .card h2 {
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .card .sized h2 {
-            font-size: 20px;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
             font-weight: 600;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .teal { background: linear-gradient(145deg, #f97316, #ea580c); }
-        .green { background: linear-gradient(145deg, #10b981, #059669); }
-        .blue { background: linear-gradient(145deg, #3b82f6, #2563eb); }
-        .orange { background: linear-gradient(145deg, #8b5cf6, #6d28d9); }
-
-        /* Tables Section */
-        .tabling {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 24px;
-        }
-
-        .left-panels {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
-
-        .table-sections {
-            background: white;
-            border-radius: 24px;
-            padding: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-        }
-
-        .table-title {
-            font-weight: 700;
-            font-size: 18px;
-            color: #0f172a;
-            margin-bottom: 18px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 8px;
         }
+        .action-buttons button:hover { background: #6366f1; transform: translateY(-2px); }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .tab-content { display: none; animation: fadeIn 0.3s; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Enhanced stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
+        .stat-card {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            padding: 24px 20px;
+            border-radius: 28px;
+            text-align: center;
+            box-shadow: 0 12px 20px -8px rgba(79, 70, 229, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: white;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px -10px rgba(79, 70, 229, 0.4);
+        }
+        .stat-card h3 { font-size: 36px; font-weight: 800; margin-bottom: 8px; }
+        .stat-card p { font-size: 14px; opacity: 0.9; letter-spacing: 0.5px; }
 
+        /* Metric cards for analytics tab */
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+        .metric-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-left: 4px solid #4f46e5;
+        }
+        .metric-card h4 { font-size: 14px; color: #64748b; margin-bottom: 8px; }
+        .metric-card .value { font-size: 28px; font-weight: 800; color: #1e293b; }
+        .metric-card .unit { font-size: 12px; color: #94a3b8; }
+
+        .full-table {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            overflow-x: auto;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        table { width: 100%; border-collapse: collapse; }
         th {
             background: #f8fafc;
             padding: 14px 12px;
             text-align: left;
             font-weight: 600;
-            color: #475569;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+            color: #1e293b;
             border-bottom: 2px solid #e2e8f0;
         }
-
         td {
-            padding: 14px 12px;
+            padding: 12px;
             border-bottom: 1px solid #f1f5f9;
-            color: #1e293b;
+            color: #334155;
         }
-
-        tr:hover td {
-            background: #fafcff;
+        .badge {
+            padding: 4px 10px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
         }
+        .badge-pass { background: #d1fae5; color: #065f46; }
+        .badge-fail { background: #fee2e2; color: #991b1b; }
 
-        /* Pass/Fail Donut Card */
-        .passfail-card {
-            background: white;
+        .ai-insight-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
             padding: 24px;
             border-radius: 24px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-            margin-top: 24px;
+            margin-bottom: 24px;
+            border-left: 5px solid #4f46e5;
         }
-
-        .passfail-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #0f172a;
-        }
-
-        .radial-wrapper {
-            display: flex;
-            justify-content: center;
-        }
-
+        .radial-wrapper { display: flex; justify-content: center; margin: 20px 0; }
         .radial-chart {
-            width: 220px;
-            height: 220px;
-            border-radius: 50%;
-            position: relative;
-            background: #e2e8f0;
+            width: 200px; height: 200px; border-radius: 50%;
+            position: relative; background: #e2e8f0;
         }
-
         .radial-chart::before {
-            content: "";
-            position: absolute;
-            inset: 25px;
-            background: white;
-            border-radius: 50%;
+            content: ""; position: absolute; inset: 25px; background: white; border-radius: 50%;
         }
-
         .center {
-            position: absolute;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 24px;
-            color: #0f172a;
-            z-index: 2;
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; font-weight: 700; font-size: 24px; color: #0f172a; z-index: 2;
         }
-
-        .center small {
-            font-size: 13px;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        .legend {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 24px;
-        }
-
-        .legend .item {
-            font-size: 15px;
-            color: #334155;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 500;
-        }
-
-        .legend strong {
-            margin-left: 4px;
-            color: #0f172a;
-            font-weight: 700;
-        }
-
-        .dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-
+        .legend { display: flex; justify-content: space-around; margin-top: 24px; }
+        .legend .item { display: flex; align-items: center; gap: 8px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
         .dot.green { background: #22c55e; }
         .dot.red { background: #ef4444; }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .tabling { grid-template-columns: 1fr; }
+        /* Chart containers */
+        .chart-container {
+            max-width: 500px;
+            margin: 0 auto;
         }
+
         @media (max-width: 700px) {
             .dashboard { flex-direction: column; }
             .sidebar { width: 100%; }
@@ -360,243 +240,402 @@
     </style>
 </head>
 <body>
-
 <div class="dashboard">
-
-    <!-- SIDEBAR -->
     <aside class="sidebar">
-        <div class="logo">
-            <i class="fas fa-school"></i>
-            <span>Neo-Class</span>
-        </div>
+        <div class="logo"></div>
         <nav class="menu">
             <h4 class="menu-title">MENU</h4>
-
-            <a class="active" onclick="alert('Dashboard view')">
-                <div class="menu-left">
-                    <i class="fas fa-tachometer-alt"></i>
-                    Dashboard
-                </div>
+            <a data-tab="dashboardTab" class="active">
+                <div class="menu-left"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
                 <i class="fas fa-chevron-right arrow"></i>
             </a>
-
-            <a onclick="alert('Best Students coming soon')">
-                <div class="menu-left">
-                    <i class="fas fa-star"></i>
-                    Best Students
-                </div>
+            <a data-tab="bestStudentsTab">
+                <div class="menu-left"><i class="fas fa-star"></i> Best Students</div>
                 <i class="fas fa-chevron-right arrow"></i>
             </a>
-
-            <a onclick="alert('Failed Students coming soon')">
-                <div class="menu-left">
-                    <i class="fas fa-times-circle"></i>
-                    Failed Students
-                </div>
+            <a data-tab="failedStudentsTab">
+                <div class="menu-left"><i class="fas fa-times-circle"></i> Failed Students</div>
                 <i class="fas fa-chevron-right arrow"></i>
             </a>
-
-            <a onclick="alert('Analytics coming soon')">
-                <div class="menu-left">
-                    <i class="fas fa-chart-line"></i>
-                    Analytics
-                </div>
+            <a data-tab="analyticsTab">
+                <div class="menu-left"><i class="fas fa-chart-line"></i> Analytics</div>
                 <i class="fas fa-chevron-right arrow"></i>
             </a>
-
-            <a onclick="alert('Students list coming soon')">
-                <div class="menu-left">
-                    <i class="fas fa-user-graduate"></i>
-                    Students
-                </div>
+            <a data-tab="studentsListTab">
+                <div class="menu-left"><i class="fas fa-user-graduate"></i> Students</div>
+                <i class="fas fa-chevron-right arrow"></i>
+            </a>
+            <a data-tab="aiTab">
+                <div class="menu-left"><i class="fas fa-brain"></i> Neo‑Gen AI</div>
                 <i class="fas fa-chevron-right arrow"></i>
             </a>
         </nav>
-
         <div class="sidebar-logout">
-            <a href="{{ url_for('logout') }}">
-                <i class="fas fa-sign-out-alt"></i>
-                Logout
-            </a>
+            <a href="{{ url_for('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </aside>
 
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <main class="main-content" id="reportContent">
+        <div class="topbar">
+            <h2><i class="fas fa-chart-pie"></i> Performance Intelligence</h2>
+            <div class="action-buttons">
+                <button id="downloadPDFBtn"><i class="fas fa-download"></i> Download PDF</button>
+                <button id="printBtn"><i class="fas fa-print"></i> Print</button>
+            </div>
+        </div>
 
-        <header class="topbar">
-            <h2><i class="fas fa-chart-pie" style="margin-right: 12px; color: #3b82f6;"></i>Performance Dashboard</h2>
-            <span style="color: #64748b;">{{ class_name }} · {{ subject_name }} · {{ term }}</span>
-        </header>
-
-        <!-- STATS -->
-        <section class="stats">
-
-            <div class="card teal">
-                <div class="card-icon"><i class="fas fa-users"></i></div>
-                <h4>Total Students</h4>
-                <h2>{{ total_students }}</h2>
+        <!-- ========== DASHBOARD TAB ========== -->
+        <div id="dashboardTab" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card"><h3>{{ total_students }}</h3><p>Total Students</p></div>
+                <div class="stat-card"><h3>{{ pass_rate }}%</h3><p>Pass Rate</p></div>
+                <div class="stat-card"><h3>{{ top_performer.name if top_performer else '—' }}</h3><p>Top Performer</p></div>
+                <div class="stat-card"><h3>{{ subject_name }}</h3><p>Subject</p></div>
             </div>
 
-            <div class="card green">
-                <div class="card-icon"><i class="fas fa-check-circle"></i></div>
-                <h4>Pass Rate</h4>
-                <h2>{{ pass_rate }}%</h2>
+            <div class="full-table">
+                <h3><i class="fas fa-crown" style="color: #fbbf24;"></i> Top 5 Students</h3>
+                <table>
+                    <thead><tr><th>ID</th><th>Name</th><th>Mark</th></tr></thead>
+                    <tbody>
+                        {% for student in top_5 %}
+                        <tr><td>{{ student.student_id }}</td><td>{{ student.name }}</td><td>{{ student.score }}%</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <div class="card blue">
-                <div class="card-icon"><i class="fas fa-trophy"></i></div>
-                <h4>Top Performer</h4>
-                <div class="sized"><h2>{{ top_performer.name if top_performer else '—' }}</h2></div>
+            <div class="full-table">
+                <h3><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Bottom 5 Students</h3>
+                <table>
+                    <thead><tr><th>ID</th><th>Name</th><th>Mark</th></tr></thead>
+                    <tbody>
+                        {% for student in bottom_5 %}
+                        <tr><td>{{ student.student_id }}</td><td>{{ student.name }}</td><td>{{ student.score }}%</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
 
-            <div class="card orange">
-                <div class="card-icon"><i class="fas fa-book"></i></div>
-                <h4>Subject</h4>
-                <h2>{{ subject_name }}</h2>
+            <div class="full-table">
+                <h3><i class="fas fa-chart-bar" style="color: #3b82f6;"></i> Results Analytics</h3>
+                <table>
+                    <thead>
+                        <tr><th>Symbol</th><th>Total</th><th>Passed</th><th>Failed</th><th>Mean</th><th>% of Total</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for analytic in analytics %}
+                        <tr>
+                            <td><strong>{{ analytic.symbol }}</strong></td>
+                            <td>{{ analytic.num_students }}</td>
+                            <td>{{ analytic.passed }}</td>
+                            <td>{{ analytic.failed }}</td>
+                            <td>{{ analytic.mean }}%</td>
+                            <td>{{ (analytic.num_students / total_students * 100)|round(1) if total_students else 0 }}%</td>
+                        </tr>
+                        {% endfor %}
+                        <tr style="font-weight:700; background:#f1f5f9;">
+                            <td>OVERALL</td><td>{{ total_students }}</td><td>{{ total_passed }}</td><td>{{ total_failed }}</td><td>{{ overall_mean }}%</td><td>100%</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
-        </section>
-
-        <!-- TABLES -->
-        <section class="tabling">
-
-            <div class="left-panels">
-
-                <div class="table-sections">
-                    <div class="table-title"><i class="fas fa-crown" style="color: #fbbf24;"></i> Top 5 Students</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Mark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in top_5 %}
-                            <tr>
-                                <td>{{ student.student_id }}</td>
-                                <td>{{ student.name }}</td>
-                                <td>{{ student.score }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="table-sections">
-                    <div class="table-title"><i class="fas fa-exclamation-triangle" style="color: #ef4444;"></i> Bottom 5 Students</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>Mark</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in bottom_5 %}
-                            <tr>
-                                <td>{{ student.student_id }}</td>
-                                <td>{{ student.name }}</td>
-                                <td>{{ student.score }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-
-            </div>
-
-            <div class="right-panels">
-                <div class="table-sections">
-                    <div class="table-title"><i class="fas fa-chart-bar" style="color: #3b82f6;"></i> Results Analytics</div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Symbol</th>
-                                <th>Total</th>
-                                <th>Passed</th>
-                                <th>Failed</th>
-                                <th>Mean</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for analytic in analytics %}
-                            <tr>
-                                <td><strong>{{ analytic.symbol }}</strong></td>
-                                <td>{{ analytic.num_students }}</td>
-                                <td>{{ analytic.passed }}</td>
-                                <td>{{ analytic.failed }}</td>
-                                <td>{{ analytic.mean }}%</td>
-                            </tr>
-                            {% endfor %}
-                            <tr style="font-weight:700; background:#f1f5f9;">
-                               <td>OVERALL</td>
-                               <td>{{ total_students }}</td>
-                               <td>{{ total_passed }}</td>
-                               <td>{{ total_failed }}</td>
-                               <td>{{ overall_mean }}%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- PASS/FAIL DONUT CARD -->
-                <div class="passfail-card">
-                    <h3><i class="fas fa-chart-pie" style="margin-right: 8px;"></i> Subject Overview</h3>
-
-                    <div class="radial-wrapper">
-                        <div class="radial-chart"
-                             data-passed="{{ total_passed }}"
-                             data-failed="{{ total_failed }}">
-                            <div class="center">
-                                {{ total_students|default(0) }}<br>
-                                <small>Students</small>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="legend">
-                        <div class="item">
-                            <span class="dot red"></span>
-                            Failed <strong>{{ total_failed }}</strong>
-                        </div>
-                        <div class="item">
-                            <span class="dot green"></span>
-                            Passed <strong>{{ total_passed }}</strong>
-                        </div>
+            <div class="full-table">
+                <h3><i class="fas fa-chart-pie"></i> Subject Overview</h3>
+                <div class="radial-wrapper">
+                    <div class="radial-chart" data-passed="{{ total_passed }}" data-failed="{{ total_failed }}">
+                        <div class="center">{{ total_students|default(0) }}<br><small>Students</small></div>
                     </div>
                 </div>
+                <div class="legend">
+                    <div class="item"><span class="dot red"></span> Failed <strong>{{ total_failed }}</strong></div>
+                    <div class="item"><span class="dot green"></span> Passed <strong>{{ total_passed }}</strong></div>
+                </div>
             </div>
-        </section>
+        </div>
+
+        <!-- ========== BEST STUDENTS ========== -->
+        <div id="bestStudentsTab" class="tab-content">
+            <div class="full-table">
+                <h3><i class="fas fa-crown" style="color:#fbbf24"></i> Top Achievers (Mark ≥ 50%)</h3>
+                <table id="bestStudentsTable"><thead><tr><th>Rank</th><th>Name</th><th>Mark (%)</th><th>Performance</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <!-- ========== FAILED STUDENTS ========== -->
+        <div id="failedStudentsTab" class="tab-content">
+            <div class="full-table">
+                <h3><i class="fas fa-exclamation-triangle" style="color:#ef4444"></i> Students Needing Support (Mark ≤ 50%)</h3>
+                <table id="failedStudentsTable"><thead><tr><th>Name</th><th>Mark (%)</th><th>Intervention</th></tr></thead><tbody></tbody></table>
+            </div>
+        </div>
+
+        <!-- ========== ANALYTICS TAB ========== -->
+        <div id="analyticsTab" class="tab-content">
+            <div class="metric-grid" id="analyticsMetrics"></div>
+            <div class="full-table">
+                <h3><i class="fas fa-table"></i> Grade Distribution Details</h3>
+                <table id="gradeDistributionTable"><thead><tr><th>Grade</th><th>Students</th><th>Passed</th><th>Failed</th><th>Mean (%)</th><th>% of Total</th></tr></thead><tbody></tbody></table>
+            </div>
+            <div class="full-table">
+                <h3><i class="fas fa-chart-pie"></i> Grade Distribution (Visual)</h3>
+                <div class="chart-container"><canvas id="gradeDistributionChart" height="250"></canvas></div>
+            </div>
+            <div class="full-table">
+                <h3><i class="fas fa-chart-simple"></i> Performance by Grade Symbol</h3>
+                <div class="chart-container"><canvas id="performanceBarChart" height="250"></canvas></div>
+            </div>
+        </div>
+
+        <!-- ========== STUDENTS LIST (full roster) ========== -->
+        <div id="studentsListTab" class="tab-content">
+            <div class="full-table">
+                <h3><i class="fas fa-list"></i> Complete Student Roster ({{ subject_name }})</h3>
+                <table id="studentsListTable">
+                    <thead><tr><th>ID</th><th>Name</th><th>Mark (%)</th><th>Grade</th><th>Status</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ========== NEO-GEN AI TAB ========== -->
+        <div id="aiTab" class="tab-content">
+            <div class="ai-insight-card">
+                <i class="fas fa-brain fa-2x"></i>
+                <h2 style="margin-top:12px">Neo‑Gen AI Analysis</h2>
+                <p id="aiSummaryText" style="font-size: 1rem; line-height: 1.5;">Loading insights...</p>
+            </div>
+            <div class="full-table">
+                <h3><i class="fas fa-chart-line"></i> Key Trends & Recommendations</h3>
+                <ul id="aiTrends" style="list-style: none; padding: 0;"></ul>
+            </div>
+            <div class="full-table">
+                <h3><i class="fas fa-users"></i> Individual Student Observations</h3>
+                <ul id="aiStudentObservations" style="list-style: none; padding: 0;"></ul>
+            </div>
+        </div>
     </main>
 </div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const chart = document.querySelector(".radial-chart");
-        if (!chart) return;
-
-        const passed = parseFloat(chart.dataset.passed) || 0;
-        const failed = parseFloat(chart.dataset.failed) || 0;
-        const total = passed + failed;
-
-        if (total === 0) {
-            chart.style.background = "#e2e8f0";
-            return;
-        }
-
-        const angle = (passed / total) * 360;
-        chart.style.background = `conic-gradient(
-            #22c55e 0deg,
-            #22c55e ${angle}deg,
-            #ef4444 ${angle}deg,
-            #ef4444 360deg
-        )`;
-    });
+<!-- Hidden data containers -->
+<script type="application/json" id="analyticsData">{{ analytics|tojson|safe }}</script>
+<script type="application/json" id="top5Data">{{ top_5|tojson|safe }}</script>
+<script type="application/json" id="bottom5Data">{{ bottom_5|tojson|safe }}</script>
+<script type="application/json" id="totalData">
+{
+    "total_students": {{ total_students|default(0) }},
+    "total_passed": {{ total_passed|default(0) }},
+    "total_failed": {{ total_failed|default(0) }},
+    "class_name": "{{ class_name|default('') }}",
+    "subject_name": "{{ subject_name|default('') }}",
+    "term": "{{ term|default('') }}"
+}
 </script>
+<!-- NEW: all students data -->
+<script type="application/json" id="allStudentsData">{{ all_students|tojson|safe }}</script>
 
+<script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.sidebar nav a[data-tab]');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = tab.getAttribute('data-tab');
+            contents.forEach(c => c.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            if (targetId === 'analyticsTab') {
+                if (window.gradeChart) window.gradeChart.update();
+                if (window.barChart) window.barChart.update();
+                loadAnalyticsMetrics();
+                loadGradeDistributionTable();
+            }
+            if (targetId === 'aiTab') loadAIAnalysis();
+        });
+    });
+
+    // Donut chart initialisation
+    document.addEventListener("DOMContentLoaded", function() {
+        const chartDiv = document.querySelector(".radial-chart");
+        if (chartDiv && chartDiv.dataset.passed !== undefined) {
+            const passed = parseFloat(chartDiv.dataset.passed) || 0;
+            const failed = parseFloat(chartDiv.dataset.failed) || 0;
+            const total = passed + failed;
+            if (total > 0) {
+                const angle = (passed / total) * 360;
+                chartDiv.style.background = `conic-gradient(#22c55e 0deg, #22c55e ${angle}deg, #ef4444 ${angle}deg, #ef4444 360deg)`;
+            }
+        }
+    });
+
+    // Extract data
+    const analyticsData = JSON.parse(document.getElementById('analyticsData').innerText || '[]');
+    const top5 = JSON.parse(document.getElementById('top5Data').innerText || '[]');
+    const bottom5 = JSON.parse(document.getElementById('bottom5Data').innerText || '[]');
+    const totalData = JSON.parse(document.getElementById('totalData').innerText || '{}');
+    const allStudentsData = JSON.parse(document.getElementById('allStudentsData').innerText || '[]');
+
+    const className = totalData.class_name || 'Class';
+    const term = totalData.term || 'Term';
+    const totalStudents = totalData.total_students || 0;
+    const totalPassed = totalData.total_passed || 0;
+    const totalFailed = totalData.total_failed || 0;
+
+    // Compute additional metrics from analyticsData
+    let overallAvg = 0;
+    let highestGroupAvg = 0, highestGroupName = '';
+    let lowestGroupAvg = 100, lowestGroupName = '';
+    if (analyticsData && analyticsData.length) {
+        let totalWeighted = 0, totalCount = 0;
+        analyticsData.forEach(g => {
+            totalWeighted += g.mean * g.num_students;
+            totalCount += g.num_students;
+            if (g.mean > highestGroupAvg) { highestGroupAvg = g.mean; highestGroupName = g.symbol; }
+            if (g.mean < lowestGroupAvg) { lowestGroupAvg = g.mean; lowestGroupName = g.symbol; }
+        });
+        overallAvg = totalCount ? totalWeighted / totalCount : 0;
+    }
+
+    // Build student list from backend (all students)
+    let allStudents = allStudentsData.map(s => ({ name: s.name, score: s.score, id: s.student_id }));
+    allStudents.sort((a,b) => b.score - a.score);
+
+    const bestStudents = allStudents.filter(s => s.score >= 50).sort((a,b) => b.score - a.score);
+    const failedStudents = allStudents.filter(s => s.score <= 50).sort((a,b) => b.score - a.score);
+
+    // Helper functions
+    function loadBestStudents() {
+        const tbody = document.getElementById('bestStudentsTable');
+        if (tbody) {
+            tbody.innerHTML = bestStudents.map((s, idx) => `
+                <tr><td>${idx+1}</td><td>${s.name}</td><td>${s.score}%</td><td><span class="badge badge-pass">Excellent</span></td></tr>
+            `).join('');
+            if (bestStudents.length === 0) tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No students with mark ≥ 50%</td></tr>';
+        }
+    }
+
+    function loadFailedStudents() {
+        const tbody = document.getElementById('failedStudentsTable');
+        if (tbody) {
+            tbody.innerHTML = failedStudents.map(s => `
+                <tr><td>${s.name}</td><td>${s.score}%</td><td>Remedial classes recommended</td></tr>
+            `).join('');
+            if (failedStudents.length === 0) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;">No failing students</td></tr>';
+        }
+    }
+
+    function loadStudentsList() {
+        const tbody = document.getElementById('studentsListTable');
+        if (tbody) {
+            tbody.innerHTML = allStudents.map(s => `
+                <tr>
+                    <td>${s.id}</td>
+                    <td>${s.name}</td>
+                    <td>${s.score}%</td>
+                    <td>${s.score >= 50 ? 'Pass' : 'Fail'}</td>
+                    <td><span class="badge ${s.score >= 50 ? 'badge-pass' : 'badge-fail'}">${s.score >= 50 ? 'Passing' : 'Failing'}</span></td>
+                </tr>
+            `).join('');
+            if (allStudents.length === 0) tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No student data available</td></tr>';
+        }
+    }
+
+    // Analytics tab
+    function loadAnalyticsMetrics() {
+        const container = document.getElementById('analyticsMetrics');
+        if (!container) return;
+        const passRate = totalStudents ? (totalPassed / totalStudents * 100).toFixed(1) : 0;
+        container.innerHTML = `
+            <div class="metric-card"><h4>📊 Overall Average</h4><div class="value">${overallAvg.toFixed(1)}%</div></div>
+            <div class="metric-card"><h4>✅ Pass Rate</h4><div class="value">${passRate}%</div></div>
+            <div class="metric-card"><h4>🏆 Highest Grade</h4><div class="value">${highestGroupName} (${highestGroupAvg.toFixed(1)}%)</div></div>
+            <div class="metric-card"><h4>⚠️ Lowest Grade</h4><div class="value">${lowestGroupName} (${lowestGroupAvg.toFixed(1)}%)</div></div>
+            <div class="metric-card"><h4>📈 Passed</h4><div class="value">${totalPassed}</div></div>
+            <div class="metric-card"><h4>📉 Failed</h4><div class="value">${totalFailed}</div></div>
+        `;
+    }
+
+    function loadGradeDistributionTable() {
+        const tbody = document.querySelector('#gradeDistributionTable tbody');
+        if (!tbody || !analyticsData.length) return;
+        tbody.innerHTML = analyticsData.map(g => `
+            <tr>
+                <td><strong>${g.symbol}</strong></td>
+                <td>${g.num_students}</td>
+                <td>${g.passed}</td>
+                <td>${g.failed}</td>
+                <td>${g.mean}%</td>
+                <td>${((g.num_students / totalStudents)*100).toFixed(1)}%</td>
+            </tr>
+        `).join('');
+    }
+
+    // Charts
+    window.gradeChart = null;
+    window.barChart = null;
+    function initCharts() {
+        const ctxGrade = document.getElementById('gradeDistributionChart')?.getContext('2d');
+        if (ctxGrade && analyticsData.length) {
+            window.gradeChart = new Chart(ctxGrade, {
+                type: 'doughnut',
+                data: { labels: analyticsData.map(a => a.symbol), datasets: [{ data: analyticsData.map(a => a.num_students), backgroundColor: ['#10b981','#3b82f6','#f59e0b','#f97316','#ef4444','#8b5cf6'] }] },
+                options: { responsive: true, maintainAspectRatio: true, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+        const ctxBar = document.getElementById('performanceBarChart')?.getContext('2d');
+        if (ctxBar && analyticsData.length) {
+            window.barChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: { labels: analyticsData.map(a => a.symbol), datasets: [{ label: 'Average Score (%)', data: analyticsData.map(a => a.mean), backgroundColor: '#4f46e5' }] },
+                options: { responsive: true, maintainAspectRatio: true, scales: { y: { beginAtZero: true, max: 100 } }, plugins: { legend: { position: 'top' } } }
+            });
+        }
+    }
+
+    function loadAIAnalysis() {
+        let avg = 0, pass = 0;
+        if (analyticsData.length) {
+            let totalMarks = 0, totalStuds = 0;
+            analyticsData.forEach(a => { totalMarks += a.mean * a.num_students; totalStuds += a.num_students; });
+            avg = totalStuds ? totalMarks / totalStuds : 0;
+            pass = totalStudents ? (totalPassed / totalStudents) * 100 : 0;
+        } else { avg = 65; pass = 70; }
+        const topStudent = bestStudents[0];
+        const weakCount = failedStudents.length;
+        const strongSymbols = analyticsData.filter(a => a.mean >= 70).map(a => a.symbol);
+        const weakSymbols = analyticsData.filter(a => a.mean < 60).map(a => a.symbol);
+        const summary = `📊 Overall class average is ${avg.toFixed(1)}% with a pass rate of ${pass.toFixed(1)}%. Top performer: ${topStudent?.name || 'N/A'} (${topStudent?.score || 0}%). ${weakCount} student(s) are failing. Strong grade groups: ${strongSymbols.join(', ') || 'none'}. Groups needing attention: ${weakSymbols.join(', ') || 'none'}.`;
+        document.getElementById('aiSummaryText').innerHTML = summary;
+        document.getElementById('aiTrends').innerHTML = `
+            <li style="padding: 8px; border-bottom:1px solid #e2e8f0;">📈 The class is performing ${avg >= 70 ? 'above average' : 'below average'} compared to school targets.</li>
+            <li style="padding: 8px; border-bottom:1px solid #e2e8f0;">⚠️ ${weakSymbols.length ? weakSymbols.join(', ') : 'No weak grade groups'} need focused interventions.</li>
+            <li style="padding: 8px; border-bottom:1px solid #e2e8f0;">🎯 Recommendation: Provide extra practice worksheets for students scoring below 50%.</li>
+            <li style="padding: 8px; border-bottom:1px solid #e2e8f0;">🏆 Encourage peer tutoring among top performers and struggling students.</li>
+            <li style="padding: 8px;">📅 Schedule weekly review sessions for topics where the class average is below 60%.</li>
+        `;
+        const studentObs = document.getElementById('aiStudentObservations');
+        studentObs.innerHTML = bestStudents.slice(0,5).map(s => `<li style="padding: 8px; border-bottom:1px solid #e2e8f0;"><strong>${s.name}</strong> (${s.score}%) – ${s.score >= 80 ? 'Excelling, could lead study groups.' : s.score >= 50 ? 'On track, maintain effort.' : 'Needs immediate academic support.'}</li>`).join('');
+        if (failedStudents.length > 0) studentObs.innerHTML += `<li style="padding: 8px; background:#fee2e2; border-radius:12px;">⚠️ ${failedStudents.length} student(s) are at risk. Individual learning plans recommended.</li>`;
+    }
+
+    // PDF & Print
+    const pdfElement = document.getElementById('reportContent');
+    document.getElementById('downloadPDFBtn').addEventListener('click', () => {
+        html2pdf().set({ margin: 0.5, filename: `neo_class_${className}_${term}_report.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(pdfElement).save();
+    });
+    document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+    // Initialise
+    loadBestStudents();
+    loadFailedStudents();
+    loadStudentsList();
+    initCharts();
+    loadAIAnalysis();
+    loadAnalyticsMetrics();
+    loadGradeDistributionTable();
+</script>
 </body>
 </html>

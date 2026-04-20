@@ -500,7 +500,7 @@
 </div>
 
 <!-- ============================
-     SECURITY LOCK TAB
+     SECURITY LOCK TAB – DYNAMIC
      ============================ -->
 <div id="securityLock" class="tab-content">
   <div class="security-container">
@@ -521,23 +521,18 @@
     <div class="lock-controls-section">
       <div class="lock-control-card">
         <div class="lock-header">
-          <div class="lock-icon locked">
-            <i class="fas fa-lock"></i>
-          </div>
+          <div class="lock-icon locked"><i class="fas fa-lock"></i></div>
           <div class="lock-info">
             <h3>Teacher Mark Entry Portal</h3>
             <p>Control whether teachers can enter/edit student marks</p>
           </div>
         </div>
-        
         <div class="lock-status-display">
           <div id="teacherPortalStatus" class="status-indicator locked">
-            <i class="fas fa-lock"></i>
-            <span>LOCKED</span>
+            <i class="fas fa-lock"></i><span>LOCKED</span>
           </div>
           <p class="status-description">Teachers cannot enter marks</p>
         </div>
-
         <div class="lock-toggle-section">
           <button class="btn btn-success btn-large" id="unlockTeacherBtn" onclick="toggleTeacherPortal('unlock')">
             <i class="fas fa-unlock"></i> Unlock for Teachers
@@ -546,32 +541,26 @@
             <i class="fas fa-lock"></i> Lock Portal
           </button>
         </div>
-
         <div class="lock-details">
-          <p><strong>Last Status Change:</strong> <span id="teacherLastChange">Today at 10:30 AM by Admin</span></p>
-          <p><strong>Current Status Duration:</strong> <span id="teacherDuration">2 hours</span></p>
+          <p><strong>Last Status Change:</strong> <span id="teacherLastChange">—</span></p>
+          <p><strong>Current Status Duration:</strong> <span id="teacherDuration">—</span></p>
         </div>
       </div>
 
       <div class="lock-control-card">
         <div class="lock-header">
-          <div class="lock-icon locked">
-            <i class="fas fa-eye-slash"></i>
-          </div>
+          <div class="lock-icon locked"><i class="fas fa-eye-slash"></i></div>
           <div class="lock-info">
             <h3>Student Portal Lock</h3>
             <p>Control whether students can view their marks and reports</p>
           </div>
         </div>
-
         <div class="lock-status-display">
           <div id="studentPortalStatus" class="status-indicator locked">
-            <i class="fas fa-lock"></i>
-            <span>LOCKED</span>
+            <i class="fas fa-lock"></i><span>LOCKED</span>
           </div>
           <p class="status-description">Students cannot view their marks</p>
         </div>
-
         <div class="lock-toggle-section">
           <button class="btn btn-success btn-large" id="unlockStudentBtn" onclick="toggleStudentPortal('unlock')">
             <i class="fas fa-unlock"></i> Unlock for Students
@@ -580,73 +569,18 @@
             <i class="fas fa-eye-slash"></i> Lock Portal
           </button>
         </div>
-
         <div class="lock-details">
-          <p><strong>Last Status Change:</strong> <span id="studentLastChange">Today at 10:30 AM by Admin</span></p>
-          <p><strong>Current Status Duration:</strong> <span id="studentDuration">2 hours</span></p>
+          <p><strong>Last Status Change:</strong> <span id="studentLastChange">—</span></p>
+          <p><strong>Current Status Duration:</strong> <span id="studentDuration">—</span></p>
         </div>
       </div>
     </div>
 
-    <!-- Lock History Timeline -->
+    <!-- Lock History Timeline (dynamic) -->
     <div class="security-section">
       <h3>Portal Lock History</h3>
-      <div class="lock-history">
-        <div class="history-item teacher-portal">
-          <div class="history-icon">
-            <i class="fas fa-lock"></i>
-          </div>
-          <div class="history-details">
-            <h5>Teacher Portal LOCKED</h5>
-            <p>Admin locked the teacher mark entry portal</p>
-            <span class="history-time">Today at 10:30 AM</span>
-          </div>
-          <div class="history-reason">
-            <strong>Reason:</strong> Beginning of term - Preparing system
-          </div>
-        </div>
-
-        <div class="history-item teacher-portal">
-          <div class="history-icon">
-            <i class="fas fa-unlock"></i>
-          </div>
-          <div class="history-details">
-            <h5>Teacher Portal UNLOCKED</h5>
-            <p>Admin unlocked the teacher mark entry portal</p>
-            <span class="history-time">Yesterday at 8:00 AM</span>
-          </div>
-          <div class="history-reason">
-            <strong>Reason:</strong> Teachers ready to enter marks
-          </div>
-        </div>
-
-        <div class="history-item student-portal">
-          <div class="history-icon">
-            <i class="fas fa-lock"></i>
-          </div>
-          <div class="history-details">
-            <h5>Student Portal LOCKED</h5>
-            <p>Admin locked the student results viewing</p>
-            <span class="history-time">Today at 10:35 AM</span>
-          </div>
-          <div class="history-reason">
-            <strong>Reason:</strong> Marks entry in progress
-          </div>
-        </div>
-
-        <div class="history-item student-portal">
-          <div class="history-icon">
-            <i class="fas fa-unlock"></i>
-          </div>
-          <div class="history-details">
-            <h5>Student Portal UNLOCKED</h5>
-            <p>Admin unlocked the student results viewing</p>
-            <span class="history-time">3 days ago at 2:30 PM</span>
-          </div>
-          <div class="history-reason">
-            <strong>Reason:</strong> All marks entered and verified
-          </div>
-        </div>
+      <div class="lock-history" id="lockHistoryContainer">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading history...</div>
       </div>
     </div>
 
@@ -655,39 +589,24 @@
       <h3>Quick Actions</h3>
       <div class="quick-actions">
         <div class="action-card">
-          <i class="fas fa-lock-open"></i>
-          <h4>Unlock Both Portals</h4>
+          <i class="fas fa-lock-open"></i><h4>Unlock Both Portals</h4>
           <p>Allow teachers to enter marks and students to view results</p>
-          <button class="btn btn-info" onclick="unlockBothPortals()">
-            Execute
-          </button>
+          <button class="btn btn-info" onclick="unlockBothPortals()">Execute</button>
         </div>
-
         <div class="action-card">
-          <i class="fas fa-lock"></i>
-          <h4>Lock Both Portals</h4>
+          <i class="fas fa-lock"></i><h4>Lock Both Portals</h4>
           <p>Prevent any access to mark entry and result viewing</p>
-          <button class="btn btn-warning" onclick="lockBothPortals()">
-            Execute
-          </button>
+          <button class="btn btn-warning" onclick="lockBothPortals()">Execute</button>
         </div>
-
         <div class="action-card">
-          <i class="fas fa-shield-alt"></i>
-          <h4>Marking Mode</h4>
+          <i class="fas fa-shield-alt"></i><h4>Marking Mode</h4>
           <p>Unlock teacher portal, lock student portal for marking period</p>
-          <button class="btn btn-primary" onclick="activateMarkingMode()">
-            Activate
-          </button>
+          <button class="btn btn-primary" onclick="activateMarkingMode()">Activate</button>
         </div>
-
         <div class="action-card">
-          <i class="fas fa-eye"></i>
-          <h4>Results Released</h4>
+          <i class="fas fa-eye"></i><h4>Results Released</h4>
           <p>Lock teacher portal, unlock student portal for results viewing</p>
-          <button class="btn btn-success" onclick="releaseResults()">
-            Execute
-          </button>
+          <button class="btn btn-success" onclick="releaseResults()">Execute</button>
         </div>
       </div>
     </div>
@@ -697,9 +616,7 @@
 <!-- Lock Confirmation Modal -->
 <div id="lockConfirmModal" class="modal" style="display: none;">
   <div class="modal-content confirm-content">
-    <div class="confirm-icon warning">
-      <i class="fas fa-exclamation-triangle"></i>
-    </div>
+    <div class="confirm-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
     <h3 id="confirmTitle">Confirm Action</h3>
     <p id="confirmMessage"></p>
     <div class="confirm-details">
@@ -708,27 +625,24 @@
     </div>
     <div class="modal-footer">
       <button class="btn btn-secondary" onclick="closeModal('lockConfirmModal')">Cancel</button>
-      <button class="btn btn-primary" id="confirmBtn">Confirm</button>
+      <button class="btn btn-primary" id="confirmLockBtn">Confirm</button>
     </div>
   </div>
 </div>
 
-<!-- View All Lock History Modal (Slide‑up) -->
+<!-- View All Lock History Modal -->
 <div id="allHistoryModal" class="modal slide-up-modal" style="display: none;">
   <div class="modal-content all-history-content">
     <div class="modal-header">
       <h2><i class="fas fa-history"></i> Complete Lock History</h2>
       <button class="close-btn" onclick="closeModal('allHistoryModal')">&times;</button>
     </div>
-    <div class="modal-body" id="allHistoryBody">
-      <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading history...</div>
-    </div>
+    <div class="modal-body" id="allHistoryBody"></div>
   </div>
 </div>
 
-
 <!-- ============================
-     ACTIVITY LOG TAB
+     ACTIVITY LOG TAB – DYNAMIC
      ============================ -->
 <div id="activityLog" class="tab-content">
   <div class="activity-log-container">
@@ -761,162 +675,51 @@
       </div>
     </div>
 
-    <!-- Activity Statistics -->
+    <!-- Activity Statistics (dynamic) -->
     <div class="activity-stats">
       <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-pencil-alt"></i>
-        </div>
+        <div class="stat-icon"><i class="fas fa-pencil-alt"></i></div>
         <div class="stat-content">
           <h4>Marks Entered Today</h4>
-          <p class="stat-value">347</p>
-          <span class="stat-change">↑ 15 teachers active</span>
+          <p class="stat-value" id="statsMarks">—</p>
+          <span class="stat-change">Today's entries</span>
         </div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-sign-in-alt"></i>
-        </div>
+        <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
         <div class="stat-content">
-          <h4>Teacher Access Today</h4>
-          <p class="stat-value">28</p>
-          <span class="stat-change">↑ 12% increase</span>
+          <h4>Teacher Logins Today</h4>
+          <p class="stat-value" id="statsLogins">—</p>
+          <span class="stat-change">Unique teachers</span>
         </div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-eye"></i>
-        </div>
+        <div class="stat-icon"><i class="fas fa-eye"></i></div>
         <div class="stat-content">
           <h4>Student Views Today</h4>
-          <p class="stat-value">1,245</p>
-          <span class="stat-change">↑ Viewing marks</span>
+          <p class="stat-value" id="statsViews">—</p>
+          <span class="stat-change">Portal views</span>
         </div>
       </div>
-
       <div class="stat-card">
-        <div class="stat-icon">
-          <i class="fas fa-lock"></i>
-        </div>
+        <div class="stat-icon"><i class="fas fa-lock"></i></div>
         <div class="stat-content">
           <h4>Portal Status</h4>
-          <p class="stat-value">LOCKED</p>
-          <span class="stat-change warning">Teacher Entry Active</span>
+          <p class="stat-value" id="statsStatus">—</p>
+          <span class="stat-change">Teacher portal</span>
         </div>
       </div>
     </div>
 
-    <!-- Timeline View -->
+    <!-- Timeline View (dynamic) -->
     <div class="activity-timeline">
       <h3>Recent Activities</h3>
-      <div class="timeline">
-        <div class="timeline-item">
-          <div class="timeline-marker success">
-            <i class="fas fa-pencil-alt"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Mark Entry - Biology Form 1</h5>
-            <p class="timeline-action">Teacher BANDURA entered marks for 32 students</p>
-            <div class="timeline-details">
-              <span class="detail-badge">Teacher: BANDURA (ID: 045)</span>
-              <span class="detail-badge">Class: Form 1</span>
-              <span class="detail-badge">Subject: Biology</span>
-              <span class="detail-badge">Records: 32</span>
-            </div>
-            <span class="timeline-time">Today at 2:45 PM</span>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker info">
-            <i class="fas fa-edit"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Mark Edit - Chemistry Form 2</h5>
-            <p class="timeline-action">Teacher MWILA edited 5 existing mark records</p>
-            <div class="timeline-details">
-              <span class="detail-badge">Teacher: MWILA (ID: 023)</span>
-              <span class="detail-badge">Class: Form 2</span>
-              <span class="detail-badge">Subject: Chemistry</span>
-              <span class="detail-badge">Records Modified: 5</span>
-            </div>
-            <span class="timeline-time">Today at 1:20 PM</span>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker primary">
-            <i class="fas fa-sign-in-alt"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Teacher Portal Access</h5>
-            <p class="timeline-action">Teacher BANDA logged into teacher portal</p>
-            <div class="timeline-details">
-              <span class="detail-badge">Teacher: BANDA (ID: 015)</span>
-              <span class="detail-badge">Browser: Chrome</span>
-              <span class="detail-badge">Device: Desktop</span>
-              <span class="detail-badge">IP: 192.168.1.105</span>
-            </div>
-            <span class="timeline-time">Today at 11:30 AM</span>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker warning">
-            <i class="fas fa-lock"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Portal Lock Status Changed</h5>
-            <p class="timeline-action">Admin unlocked teacher portal for mark entry</p>
-            <div class="timeline-details">
-              <span class="detail-badge">Portal: Teacher Marks Entry</span>
-              <span class="detail-badge">New Status: UNLOCKED</span>
-              <span class="detail-badge">Previous Status: LOCKED</span>
-              <span class="detail-badge">Admin: Admin (ID: 001)</span>
-            </div>
-            <span class="timeline-time">Today at 9:15 AM</span>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker success">
-            <i class="fas fa-pencil-alt"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Mark Entry - Physics Form 1</h5>
-            <p class="timeline-action">Teacher MAZONDO entered marks for 28 students</p>
-            <div class="timeline-details">
-              <span class="detail-badge">Teacher: MAZONDO (ID: 009)</span>
-              <span class="detail-badge">Class: Form 1</span>
-              <span class="detail-badge">Subject: Physics</span>
-              <span class="detail-badge">Records: 28</span>
-            </div>
-            <span class="timeline-time">Yesterday at 4:30 PM</span>
-          </div>
-        </div>
-
-        <div class="timeline-item">
-          <div class="timeline-marker info">
-            <i class="fas fa-eye"></i>
-          </div>
-          <div class="timeline-content">
-            <h5>Student Portal Access</h5>
-            <p class="timeline-action">Student viewed marks and performance report</p>
-            <div class="timeline-details">
-              <span class="detail-badge">Student: STU-0234</span>
-              <span class="detail-badge">Class: Form 2</span>
-              <span class="detail-badge">Pages Viewed: 3</span>
-              <span class="detail-badge">Duration: 12 minutes</span>
-            </div>
-            <span class="timeline-time">Yesterday at 3:00 PM</span>
-          </div>
-        </div>
+      <div class="timeline" id="activityTimeline">
+        <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activities...</div>
       </div>
     </div>
 
-    <!-- Detailed Activity Table -->
+    <!-- Detailed Activity Table (dynamic) -->
     <div class="activity-table-section">
       <h3>Detailed Activity Log</h3>
       <div class="table-responsive">
@@ -932,92 +735,37 @@
               <th>IP Address</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>2026-04-08 14:45:32</td>
-              <td><span class="badge primary">Teacher</span></td>
-              <td>BANDURA (045)</td>
-              <td><span class="badge success">MARK ENTRY</span></td>
-              <td>Biology Form 1 - 32 records</td>
-              <td><span class="badge success">Success</span></td>
-              <td>192.168.1.100</td>
-            </tr>
-            <tr>
-              <td>2026-04-08 13:20:15</td>
-              <td><span class="badge primary">Teacher</span></td>
-              <td>MWILA (023)</td>
-              <td><span class="badge info">MARK EDIT</span></td>
-              <td>Chemistry Form 2 - 5 edits</td>
-              <td><span class="badge success">Success</span></td>
-              <td>192.168.1.102</td>
-            </tr>
-            <tr>
-              <td>2026-04-08 11:30:45</td>
-              <td><span class="badge primary">Teacher</span></td>
-              <td>BANDA (015)</td>
-              <td><span class="badge info">LOGIN</span></td>
-              <td>Teacher portal access</td>
-              <td><span class="badge success">Success</span></td>
-              <td>192.168.1.105</td>
-            </tr>
-            <tr>
-              <td>2026-04-08 09:15:20</td>
-              <td><span class="badge success">Admin</span></td>
-              <td>Admin (001)</td>
-              <td><span class="badge warning">LOCK CHANGE</span></td>
-              <td>Teacher Portal UNLOCKED</td>
-              <td><span class="badge success">Success</span></td>
-              <td>192.168.1.50</td>
-            </tr>
-            <tr>
-              <td>2026-04-07 16:30:10</td>
-              <td><span class="badge primary">Teacher</span></td>
-              <td>MAZONDO (009)</td>
-              <td><span class="badge success">MARK ENTRY</span></td>
-              <td>Physics Form 1 - 28 records</td>
-              <td><span class="badge success">Success</span></td>
-              <td>192.168.1.101</td>
-            </tr>
-            <tr>
-              <td>2026-04-07 15:00:05</td>
-              <td><span class="badge danger">Student</span></td>
-              <td>STU-0234 (Form 2)</td>
-              <td><span class="badge info">PORTAL ACCESS</span></td>
-              <td>Viewed marks - 3 pages</td>
-              <td><span class="badge success">Success</span></td>
-              <td>203.0.113.45</td>
-            </tr>
+          <tbody id="activityTableBody">
+            <tr><td colspan="7" style="text-align:center; padding:40px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
-<!-- View All Timeline Activities Modal -->
+
+<!-- View All Timeline Modal -->
 <div id="allTimelineModal" class="modal" style="display: none;">
   <div class="modal-content all-activities-content">
     <div class="modal-header">
       <h2><i class="fas fa-history"></i> All Recent Activities</h2>
       <button class="close-btn" onclick="closeModal('allTimelineModal')">&times;</button>
     </div>
-    <div class="modal-body" id="allTimelineBody">
-      <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading activities...</div>
-    </div>
+    <div class="modal-body" id="allTimelineBody"></div>
   </div>
 </div>
 
-<!-- View All Table Activities Modal -->
+<!-- View All Table Modal -->
 <div id="allTableModal" class="modal" style="display: none;">
   <div class="modal-content all-activities-content large-modal-content">
     <div class="modal-header">
       <h2><i class="fas fa-table"></i> Detailed Activity Log</h2>
       <button class="close-btn" onclick="closeModal('allTableModal')">&times;</button>
     </div>
-    <div class="modal-body" id="allTableBody">
-      <div class="loading-spinner"><i class="fas fa-spinner fa-spin"></i> Loading data...</div>
-    </div>
+    <div class="modal-body" id="allTableBody"></div>
   </div>
 </div>
+
 
 <!-- ADD STUDENTS MODAL (CENTERED & LARGER) -->
 <div id="addStudentModal" class="modal" style="display:none;">
@@ -1478,9 +1226,6 @@ let currentSubjectSelectorRow = null;
 let classSubjects = [];
 let currentDate = new Date();
 const events = [];
-let lockPendingAction = null;
-let teacherPortalLocked = true;
-let studentPortalLocked = true;
 
 // ============================
 // TAB MANAGEMENT - UNIFIED
@@ -4919,6 +4664,11 @@ async function loadWeekEvents() {
 // SECURITY LOCK FUNCTIONS (REAL DATA)
 // ============================
 
+let teacherPortalLocked = false;
+let studentPortalLocked = false;
+let lockPendingAction = null;
+let isLockOperationInProgress = false; // prevent double submission
+
 async function loadPortalStatus() {
   try {
     const res = await fetch('/api/portal-status');
@@ -4939,13 +4689,16 @@ function updateTeacherPortalUI(lastChange) {
   if (teacherPortalLocked) {
     status.className = 'status-indicator locked';
     status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
-    unlock.style.display = 'block'; lock.style.display = 'none';
+    if (unlock) unlock.style.display = 'block';
+    if (lock) lock.style.display = 'none';
   } else {
     status.className = 'status-indicator unlocked';
     status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
-    unlock.style.display = 'none'; lock.style.display = 'block';
+    if (unlock) unlock.style.display = 'none';
+    if (lock) lock.style.display = 'block';
   }
-  document.getElementById('teacherLastChange').textContent = lastChange || new Date().toLocaleString();
+  const lastChangeSpan = document.getElementById('teacherLastChange');
+  if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
 }
 
 function updateStudentPortalUI(lastChange) {
@@ -4956,137 +4709,195 @@ function updateStudentPortalUI(lastChange) {
   if (studentPortalLocked) {
     status.className = 'status-indicator locked';
     status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
-    unlock.style.display = 'block'; lock.style.display = 'none';
+    if (unlock) unlock.style.display = 'block';
+    if (lock) lock.style.display = 'none';
   } else {
     status.className = 'status-indicator unlocked';
     status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
-    unlock.style.display = 'none'; lock.style.display = 'block';
+    if (unlock) unlock.style.display = 'none';
+    if (lock) lock.style.display = 'block';
   }
-  document.getElementById('studentLastChange').textContent = lastChange || new Date().toLocaleString();
+  const lastChangeSpan = document.getElementById('studentLastChange');
+  if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
 }
 
 // ============================
-// LOCK HISTORY – ENHANCED
+// SECURITY LOCK FUNCTIONS (REAL DATA)
 // ============================
-const HISTORY_RETENTION_DAYS = 30;
+// ============================
+// LOCK HISTORY – 5‑DAY RETENTION
+// ============================
+const HISTORY_RETENTION_DAYS = 5;
 
 async function loadLockHistory() {
+  const container = document.querySelector('.lock-history');
+  if (!container) {
+    console.warn('Lock history container not found');
+    return;
+  }
+
+  // Show loading spinner immediately
+  container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Loading history...</div>';
+
   try {
     const res = await fetch('/api/lock-history');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
-    const container = document.querySelector('.lock-history');
-    if (!container) return;
-
     const allHistory = data.history || [];
     const now = new Date();
 
-    // Filter out items older than 30 days for main view
+    // Keep only items from the last 5 days
     const recentHistory = allHistory.filter(item => {
       const itemDate = new Date(item.timestamp);
       const diffDays = Math.floor((now - itemDate) / (1000 * 60 * 60 * 24));
       return diffDays <= HISTORY_RETENTION_DAYS;
     });
 
-    // Keep only latest 7
     const displayHistory = recentHistory.slice(0, 7);
 
     if (displayHistory.length) {
       container.innerHTML = displayHistory.map(item => {
         const itemDate = new Date(item.timestamp);
-        const diffDays = Math.floor((now - itemDate) / (1000 * 60 * 60 * 24));
-        const expiringSoon = diffDays >= HISTORY_RETENTION_DAYS - 5; // within 5 days of expiry
-
         return `
-          <div class="history-item ${item.portal}-portal ${expiringSoon ? 'expiring-soon' : ''}">
-            <div class="history-icon">
-              <i class="fas fa-${item.action === 'lock' ? 'lock' : 'unlock'}"></i>
-            </div>
+          <div class="history-item ${item.portal}-portal">
+            <div class="history-icon"><i class="fas fa-${item.action === 'lock' ? 'lock' : 'unlock'}"></i></div>
             <div class="history-details">
               <h5>${item.portal === 'teacher' ? 'Teacher' : 'Student'} Portal ${item.action.toUpperCase()}ED</h5>
               <p>Admin ${item.action}ed the ${item.portal} portal</p>
               <span class="history-time">${itemDate.toLocaleString()}</span>
-              ${expiringSoon ? '<div class="expiry-warning"><i class="fas fa-hourglass-half"></i> Expires soon</div>' : ''}
             </div>
-            <div class="history-reason">
-              <strong>Reason:</strong> ${item.reason || '—'}
-            </div>
+            <div class="history-reason"><strong>Reason:</strong> ${item.reason || '—'}</div>
           </div>
         `;
       }).join('');
-
-      // Add "View All" button if there are more than 7 recent items or any older items exist
       if (recentHistory.length > 7 || allHistory.length > recentHistory.length) {
-        container.innerHTML += `
-          <div style="text-align: center; margin-top: 20px;">
-            <button class="view-all-btn" onclick="openAllHistoryModal()">
-              <i class="fas fa-list"></i> View All History (${allHistory.length} total)
-            </button>
-          </div>
-        `;
+        container.innerHTML += `<div style="text-align: center; margin-top: 20px;"><button class="view-all-btn" onclick="openAllHistoryModal()"><i class="fas fa-list"></i> View All History (${allHistory.length} total)</button></div>`;
       }
     } else {
-      container.innerHTML = '<p style="color:#999; text-align:center; padding:20px;">No recent lock history</p>';
+      container.innerHTML = '<p style="color:#999; text-align:center; padding:20px;">No lock history in the last 5 days</p>';
     }
-
-    // Store all history globally for the modal
     window.allLockHistory = allHistory;
   } catch (e) {
     console.error('History error', e);
+    container.innerHTML = '<p style="color:#e74c3c; text-align:center; padding:20px;">Failed to load lock history. Please refresh the page.</p>';
   }
 }
 
 function openAllHistoryModal() {
   const modal = document.getElementById('allHistoryModal');
   const body = document.getElementById('allHistoryBody');
+  if (!modal || !body) return;
   modal.style.display = 'flex';
   modal.classList.add('active');
-
   const history = window.allLockHistory || [];
-  const now = new Date();
-
   if (!history.length) {
     body.innerHTML = '<p style="text-align:center; color:#999;">No history available</p>';
     return;
   }
-
   body.innerHTML = history.map(item => {
     const itemDate = new Date(item.timestamp);
-    const diffDays = Math.floor((now - itemDate) / (1000 * 60 * 60 * 24));
-    const expiringSoon = diffDays >= HISTORY_RETENTION_DAYS - 5 && diffDays <= HISTORY_RETENTION_DAYS;
-
     return `
-      <div class="history-item ${item.portal}-portal ${expiringSoon ? 'expiring-soon' : ''}" style="margin-bottom: 16px;">
-        <div class="history-icon">
-          <i class="fas fa-${item.action === 'lock' ? 'lock' : 'unlock'}"></i>
-        </div>
+      <div class="history-item ${item.portal}-portal" style="margin-bottom: 16px;">
+        <div class="history-icon"><i class="fas fa-${item.action === 'lock' ? 'lock' : 'unlock'}"></i></div>
         <div class="history-details">
           <h5>${item.portal === 'teacher' ? 'Teacher' : 'Student'} Portal ${item.action.toUpperCase()}ED</h5>
           <p>Admin ${item.action}ed the ${item.portal} portal</p>
           <span class="history-time">${itemDate.toLocaleString()}</span>
-          ${expiringSoon ? '<div class="expiry-warning"><i class="fas fa-hourglass-half"></i> Expiring soon</div>' : ''}
         </div>
-        <div class="history-reason">
-          <strong>Reason:</strong> ${item.reason || '—'}
-        </div>
+        <div class="history-reason"><strong>Reason:</strong> ${item.reason || '—'}</div>
       </div>
     `;
   }).join('');
 }
 
+// Spinner helper for the confirm button
+function setConfirmButtonLoading(loading) {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (!confirmBtn) return;
+  if (loading) {
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
+  } else {
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = 'Confirm';
+  }
+}
+
+// ============================
+// PORTAL STATUS UI
+// ============================
+async function loadPortalStatus() {
+  try {
+    const res = await fetch('/api/portal-status');
+    const data = await res.json();
+    teacherPortalLocked = data.teacher_locked;
+    studentPortalLocked = data.student_locked;
+    updateTeacherPortalUI(data.teacher_last_change);
+    updateStudentPortalUI(data.student_last_change);
+    // Load lock history after status is updated
+    await loadLockHistory();
+  } catch (e) {
+    console.error('Portal status error', e);
+  }
+}
+
+function updateTeacherPortalUI(lastChange) {
+  const status = document.getElementById('teacherPortalStatus');
+  const unlock = document.getElementById('unlockTeacherBtn');
+  const lock = document.getElementById('lockTeacherBtn');
+  if (!status) return;
+  if (teacherPortalLocked) {
+    status.className = 'status-indicator locked';
+    status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
+    if (unlock) unlock.style.display = 'block';
+    if (lock) lock.style.display = 'none';
+  } else {
+    status.className = 'status-indicator unlocked';
+    status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
+    if (unlock) unlock.style.display = 'none';
+    if (lock) lock.style.display = 'block';
+  }
+  const lastChangeSpan = document.getElementById('teacherLastChange');
+  if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
+}
+
+function updateStudentPortalUI(lastChange) {
+  const status = document.getElementById('studentPortalStatus');
+  const unlock = document.getElementById('unlockStudentBtn');
+  const lock = document.getElementById('lockStudentBtn');
+  if (!status) return;
+  if (studentPortalLocked) {
+    status.className = 'status-indicator locked';
+    status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
+    if (unlock) unlock.style.display = 'block';
+    if (lock) lock.style.display = 'none';
+  } else {
+    status.className = 'status-indicator unlocked';
+    status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
+    if (unlock) unlock.style.display = 'none';
+    if (lock) lock.style.display = 'block';
+  }
+  const lastChangeSpan = document.getElementById('studentLastChange');
+  if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
+}
+
+// ============================
+// LOCK ACTIONS
+// ============================
 function toggleTeacherPortal(action) {
   lockPendingAction = { type: 'teacher_portal', action };
   showLockConfirmModal(
-    action==='unlock'?'Unlock Teacher Portal?':'Lock Teacher Portal?',
-    action==='unlock'?'Teachers will be able to enter/edit marks.':'Teachers will NOT be able to enter/edit marks.',
-    action==='unlock'?['Enable mark entry','Allow editing']:['Disable mark entry','Protect existing marks']
+    action === 'unlock' ? 'Unlock Teacher Portal?' : 'Lock Teacher Portal?',
+    action === 'unlock' ? 'Teachers will be able to enter/edit marks.' : 'Teachers will NOT be able to enter/edit marks.',
+    action === 'unlock' ? ['Enable mark entry', 'Allow editing'] : ['Disable mark entry', 'Protect existing marks']
   );
 }
 function toggleStudentPortal(action) {
   lockPendingAction = { type: 'student_portal', action };
   showLockConfirmModal(
-    action==='unlock'?'Unlock Student Portal?':'Lock Student Portal?',
-    action==='unlock'?'Students can view marks/reports.':'Students cannot view marks/reports.',
-    action==='unlock'?['Enable result viewing']:['Hide results']
+    action === 'unlock' ? 'Unlock Student Portal?' : 'Lock Student Portal?',
+    action === 'unlock' ? 'Students can view marks/reports.' : 'Students cannot view marks/reports.',
+    action === 'unlock' ? ['Enable result viewing'] : ['Hide results']
   );
 }
 function unlockBothPortals() {
@@ -5095,15 +4906,15 @@ function unlockBothPortals() {
 }
 function lockBothPortals() {
   lockPendingAction = { type: 'both', action: 'lock' };
-  showLockConfirmModal('Lock Both Portals?', 'No access for anyone.', ['Teachers locked','Students locked']);
+  showLockConfirmModal('Lock Both Portals?', 'No access for anyone.', ['Teachers locked', 'Students locked']);
 }
 function activateMarkingMode() {
   lockPendingAction = { type: 'marking_mode' };
-  showLockConfirmModal('Activate Marking Mode?', 'Teachers UNLOCKED, students LOCKED.', ['Teachers can enter marks','Students cannot view']);
+  showLockConfirmModal('Activate Marking Mode?', 'Teachers UNLOCKED, students LOCKED.', ['Teachers can enter marks', 'Students cannot view']);
 }
 function releaseResults() {
   lockPendingAction = { type: 'release_results' };
-  showLockConfirmModal('Release Results?', 'Teachers LOCKED, students UNLOCKED.', ['Students can view results','Teachers cannot modify']);
+  showLockConfirmModal('Release Results?', 'Teachers LOCKED, students UNLOCKED.', ['Students can view results', 'Teachers cannot modify']);
 }
 
 function showLockConfirmModal(title, msg, list) {
@@ -5112,48 +4923,105 @@ function showLockConfirmModal(title, msg, list) {
   document.getElementById('confirmTitle').textContent = title;
   document.getElementById('confirmMessage').textContent = msg;
   document.getElementById('confirmList').innerHTML = list.map(l => `<li>✓ ${l}</li>`).join('');
+  setConfirmButtonLoading(false);
   modal.style.display = 'flex';
   modal.classList.add('active');
 }
 
 async function confirmLockChange() {
-  if (!lockPendingAction) return;
+  if (!lockPendingAction || isLockOperationInProgress) return;
+  isLockOperationInProgress = true;
+  setConfirmButtonLoading(true);
+
   const { type, action } = lockPendingAction;
   try {
     if (type === 'teacher_portal' || type === 'student_portal') {
       const portal = type === 'teacher_portal' ? 'teacher' : 'student';
       const res = await fetch('/api/portal-status', {
-        method: 'POST', headers: {'Content-Type':'application/json'},
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ portal, action })
       });
       const data = await res.json();
       if (data.success) {
         showNotification(`Portal ${action}ed!`, 'success');
         logActivity(`${portal}_portal_${action}`, `${portal} portal ${action}ed`);
-        loadPortalStatus();
-      } else showNotification(data.message||'Failed', 'error');
+        await loadPortalStatus(); // reload everything
+      } else {
+        showNotification(data.message || 'Failed', 'error');
+      }
     } else if (type === 'both') {
-      await fetch('/api/portal-status', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portal:'teacher',action})});
-      await fetch('/api/portal-status', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portal:'student',action})});
+      await fetch('/api/portal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ portal: 'teacher', action }) });
+      await fetch('/api/portal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ portal: 'student', action }) });
       showNotification(`Both portals ${action}ed!`, 'success');
-      loadPortalStatus();
+      await loadPortalStatus();
     } else if (type === 'marking_mode') {
-      await fetch('/api/portal-status', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portal:'teacher',action:'unlock'})});
-      await fetch('/api/portal-status', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portal:'student',action:'lock'})});
+      await fetch('/api/portal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ portal: 'teacher', action: 'unlock' }) });
+      await fetch('/api/portal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ portal: 'student', action: 'lock' }) });
       showNotification('Marking mode activated', 'success');
-      loadPortalStatus();
+      await loadPortalStatus();
     } else if (type === 'release_results') {
-      await fetch('/api/portal-status', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portal:'teacher',action:'lock'})});
-      await fetch('/api/portal-status', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({portal:'student',action:'unlock'})});
+      await fetch('/api/portal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ portal: 'teacher', action: 'lock' }) });
+      await fetch('/api/portal-status', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ portal: 'student', action: 'unlock' }) });
       showNotification('Results released', 'success');
-      loadPortalStatus();
+      await loadPortalStatus();
     }
-  } catch (e) { showNotification('Error updating', 'error'); }
-  closeModal('lockConfirmModal');
-  lockPendingAction = null;
+  } catch (e) {
+    console.error(e);
+    showNotification('Error updating portal status', 'error');
+  } finally {
+    isLockOperationInProgress = false;
+    setConfirmButtonLoading(false);
+    closeModal('lockConfirmModal');
+    lockPendingAction = null;
+  }
 }
 
+// ============================
+// UTILITIES
+// ============================
+function logActivity(type, description) {
+  fetch('/api/log-activity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, description, status: 'Success' })
+  }).catch(err => console.warn('Activity log failed', err));
+}
 
+function showNotification(message, type = 'info') {
+  const colors = { success: '#2ecc71', error: '#e74c3c', info: '#3498db', warning: '#f39c12' };
+  const notification = document.createElement('div');
+  notification.style.cssText = `position:fixed; top:20px; right:20px; background:${colors[type]}; color:white; padding:15px 25px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.2); z-index:2000; animation:slideIn 0.3s ease; font-weight:600;`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  }
+}
+
+// ============================
+// INITIALISATION
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (confirmBtn) confirmBtn.addEventListener('click', confirmLockChange);
+  const securityTab = document.querySelector('a[data-tab="securityLock"]');
+  if (securityTab) {
+    securityTab.addEventListener('click', function() {
+      loadPortalStatus();
+    });
+  }
+  // If the security lock tab is already active on page load (unlikely), load it
+  if (document.getElementById('securityLock')?.classList.contains('active')) {
+    loadPortalStatus();
+  }
+});
 // ============================
 // ACTIVITY LOG – ENHANCED
 // ============================
@@ -5397,6 +5265,7 @@ function getActivityBadgeClass(type) {
   };
   return classes[type] || 'primary';
 }
+
 // ============================
 // FINAL INITIALIZATION (SINGLE DOMCONTENTLOADED)
 // ============================
