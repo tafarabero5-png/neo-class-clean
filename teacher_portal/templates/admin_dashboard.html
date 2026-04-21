@@ -4661,100 +4661,30 @@ async function loadWeekEvents() {
 }
 
 // ============================
-// SECURITY LOCK FUNCTIONS (REAL DATA)
+// SECURITY LOCK – FINAL CORRECT
 // ============================
-
 let teacherPortalLocked = false;
 let studentPortalLocked = false;
 let lockPendingAction = null;
-let isLockOperationInProgress = false; // prevent double submission
-
-async function loadPortalStatus() {
-  try {
-    const res = await fetch('/api/portal-status');
-    const data = await res.json();
-    teacherPortalLocked = data.teacher_locked;
-    studentPortalLocked = data.student_locked;
-    updateTeacherPortalUI(data.teacher_last_change);
-    updateStudentPortalUI(data.student_last_change);
-    loadLockHistory();
-  } catch (e) { console.error('Portal status error', e); }
-}
-
-function updateTeacherPortalUI(lastChange) {
-  const status = document.getElementById('teacherPortalStatus');
-  const unlock = document.getElementById('unlockTeacherBtn');
-  const lock = document.getElementById('lockTeacherBtn');
-  if (!status) return;
-  if (teacherPortalLocked) {
-    status.className = 'status-indicator locked';
-    status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
-    if (unlock) unlock.style.display = 'block';
-    if (lock) lock.style.display = 'none';
-  } else {
-    status.className = 'status-indicator unlocked';
-    status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
-    if (unlock) unlock.style.display = 'none';
-    if (lock) lock.style.display = 'block';
-  }
-  const lastChangeSpan = document.getElementById('teacherLastChange');
-  if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
-}
-
-function updateStudentPortalUI(lastChange) {
-  const status = document.getElementById('studentPortalStatus');
-  const unlock = document.getElementById('unlockStudentBtn');
-  const lock = document.getElementById('lockStudentBtn');
-  if (!status) return;
-  if (studentPortalLocked) {
-    status.className = 'status-indicator locked';
-    status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
-    if (unlock) unlock.style.display = 'block';
-    if (lock) lock.style.display = 'none';
-  } else {
-    status.className = 'status-indicator unlocked';
-    status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
-    if (unlock) unlock.style.display = 'none';
-    if (lock) lock.style.display = 'block';
-  }
-  const lastChangeSpan = document.getElementById('studentLastChange');
-  if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
-}
-
-// ============================
-// SECURITY LOCK FUNCTIONS (REAL DATA)
-// ============================
-// ============================
-// LOCK HISTORY – 5‑DAY RETENTION
-// ============================
+let isLockOperationInProgress = false;
 const HISTORY_RETENTION_DAYS = 5;
 
+// ---------- LOCK HISTORY ----------
 async function loadLockHistory() {
   const container = document.querySelector('.lock-history');
-  if (!container) {
-    console.warn('Lock history container not found');
-    return;
-  }
-
-  // Show loading spinner immediately
+  if (!container) return;
   container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner fa-pulse"></i> Loading history...</div>';
-
   try {
-    const res = await fetch('/api/lock-history');
+    const res = await fetch('/api/lock-history', { cache: 'no-store' });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     const allHistory = data.history || [];
     const now = new Date();
-
-    // Keep only items from the last 5 days
     const recentHistory = allHistory.filter(item => {
-      const itemDate = new Date(item.timestamp);
-      const diffDays = Math.floor((now - itemDate) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.floor((now - new Date(item.timestamp)) / (1000 * 60 * 60 * 24));
       return diffDays <= HISTORY_RETENTION_DAYS;
     });
-
     const displayHistory = recentHistory.slice(0, 7);
-
     if (displayHistory.length) {
       container.innerHTML = displayHistory.map(item => {
         const itemDate = new Date(item.timestamp);
@@ -4778,8 +4708,8 @@ async function loadLockHistory() {
     }
     window.allLockHistory = allHistory;
   } catch (e) {
-    console.error('History error', e);
-    container.innerHTML = '<p style="color:#e74c3c; text-align:center; padding:20px;">Failed to load lock history. Please refresh the page.</p>';
+    console.error(e);
+    container.innerHTML = '<p style="color:#e74c3c; text-align:center; padding:20px;">Failed to load lock history.</p>';
   }
 }
 
@@ -4810,35 +4740,28 @@ function openAllHistoryModal() {
   }).join('');
 }
 
-// Spinner helper for the confirm button
-function setConfirmButtonLoading(loading) {
-  const confirmBtn = document.getElementById('confirmLockBtn');
-  if (!confirmBtn) return;
-  if (loading) {
-    confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
-  } else {
-    confirmBtn.disabled = false;
-    confirmBtn.innerHTML = 'Confirm';
-  }
-}
-
-// ============================
-// PORTAL STATUS UI
-// ============================
+// ---------- PORTAL STATUS UI (cache‑busting) ----------
 async function loadPortalStatus() {
   try {
-    const res = await fetch('/api/portal-status');
+    const res = await fetch('/api/portal-status?_=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     teacherPortalLocked = data.teacher_locked;
     studentPortalLocked = data.student_locked;
     updateTeacherPortalUI(data.teacher_last_change);
     updateStudentPortalUI(data.student_last_change);
-    // Load lock history after status is updated
+    updateLastRefreshTime();
     await loadLockHistory();
   } catch (e) {
-    console.error('Portal status error', e);
+    console.error(e);
+    const container = document.querySelector('.lock-history');
+    if (container) container.innerHTML = '<p style="color:#e74c3c;">Failed to load status. Please refresh the page.</p>';
   }
+}
+
+function updateLastRefreshTime() {
+  const el = document.getElementById('lastRefreshTime');
+  if (el) el.textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
 }
 
 function updateTeacherPortalUI(lastChange) {
@@ -4851,11 +4774,15 @@ function updateTeacherPortalUI(lastChange) {
     status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
     if (unlock) unlock.style.display = 'block';
     if (lock) lock.style.display = 'none';
+    const desc = status.closest('.lock-control-card')?.querySelector('.status-description');
+    if (desc) desc.textContent = 'Teachers cannot enter marks';
   } else {
     status.className = 'status-indicator unlocked';
     status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
     if (unlock) unlock.style.display = 'none';
     if (lock) lock.style.display = 'block';
+    const desc = status.closest('.lock-control-card')?.querySelector('.status-description');
+    if (desc) desc.textContent = 'Teachers can enter marks';
   }
   const lastChangeSpan = document.getElementById('teacherLastChange');
   if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
@@ -4871,19 +4798,33 @@ function updateStudentPortalUI(lastChange) {
     status.innerHTML = '<i class="fas fa-lock"></i><span>LOCKED</span>';
     if (unlock) unlock.style.display = 'block';
     if (lock) lock.style.display = 'none';
+    const desc = status.closest('.lock-control-card')?.querySelector('.status-description');
+    if (desc) desc.textContent = 'Students cannot view marks';
   } else {
     status.className = 'status-indicator unlocked';
     status.innerHTML = '<i class="fas fa-unlock"></i><span>UNLOCKED</span>';
     if (unlock) unlock.style.display = 'none';
     if (lock) lock.style.display = 'block';
+    const desc = status.closest('.lock-control-card')?.querySelector('.status-description');
+    if (desc) desc.textContent = 'Students can view marks';
   }
   const lastChangeSpan = document.getElementById('studentLastChange');
   if (lastChangeSpan) lastChangeSpan.textContent = lastChange ? new Date(lastChange).toLocaleString() : '—';
 }
 
-// ============================
-// LOCK ACTIONS
-// ============================
+// ---------- LOCK ACTIONS ----------
+function setConfirmButtonLoading(loading) {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (!confirmBtn) return;
+  if (loading) {
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Processing...';
+  } else {
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = 'Confirm';
+  }
+}
+
 function toggleTeacherPortal(action) {
   lockPendingAction = { type: 'teacher_portal', action };
   showLockConfirmModal(
@@ -4946,7 +4887,7 @@ async function confirmLockChange() {
       if (data.success) {
         showNotification(`Portal ${action}ed!`, 'success');
         logActivity(`${portal}_portal_${action}`, `${portal} portal ${action}ed`);
-        await loadPortalStatus(); // reload everything
+        await loadPortalStatus();
       } else {
         showNotification(data.message || 'Failed', 'error');
       }
@@ -4976,6 +4917,215 @@ async function confirmLockChange() {
     lockPendingAction = null;
   }
 }
+
+// ---------- UTILITIES ----------
+function logActivity(type, description) {
+  fetch('/api/log-activity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, description, status: 'Success' })
+  }).catch(err => console.warn('Activity log failed', err));
+}
+
+function showNotification(message, type = 'info') {
+  const colors = { success: '#2ecc71', error: '#e74c3c', info: '#3498db', warning: '#f39c12' };
+  const notification = document.createElement('div');
+  notification.style.cssText = `position:fixed; top:20px; right:20px; background:${colors[type]}; color:white; padding:15px 25px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.2); z-index:2000; animation:slideIn 0.3s ease; font-weight:600;`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  }
+}
+
+// ---------- MANUAL REFRESH (optional but safe) ----------
+function forceRefreshPortalStatus() {
+  loadPortalStatus();
+  showNotification('Refreshed portal status', 'info');
+}
+
+// ---------- AUTO-REFRESH ON TAB CLICK & PAGE VISIBILITY ----------
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (confirmBtn) confirmBtn.addEventListener('click', confirmLockChange);
+
+  // ✅ FIX: Fetch portal status immediately on page load
+  loadPortalStatus();
+
+  const securityTab = document.querySelector('a[data-tab="securityLock"]');
+  if (securityTab) {
+    securityTab.removeEventListener('click', loadPortalStatus);
+    securityTab.addEventListener('click', function() {
+      loadPortalStatus();
+    });
+  }
+
+  // Keep the visibility change fallback (refreshes when returning to the tab)
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && document.getElementById('securityLock')?.classList.contains('active')) {
+      loadPortalStatus();
+    }
+  });
+});
+
+// ============================
+// UTILITIES
+// ============================
+function logActivity(type, description) {
+  fetch('/api/log-activity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, description, status: 'Success' })
+  }).catch(err => console.warn('Activity log failed', err));
+}
+
+function showNotification(message, type = 'info') {
+  const colors = { success: '#2ecc71', error: '#e74c3c', info: '#3498db', warning: '#f39c12' };
+  const notification = document.createElement('div');
+  notification.style.cssText = `position:fixed; top:20px; right:20px; background:${colors[type]}; color:white; padding:15px 25px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.2); z-index:2000; animation:slideIn 0.3s ease; font-weight:600;`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  }
+}
+
+// ============================
+// INITIALISATION & REFRESH ON TAB VISIBILITY
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (confirmBtn) confirmBtn.addEventListener('click', confirmLockChange);
+
+  const securityTab = document.querySelector('a[data-tab="securityLock"]');
+  if (securityTab) {
+    securityTab.removeEventListener('click', loadPortalStatus);
+    securityTab.addEventListener('click', function() {
+      loadPortalStatus();
+    });
+  }
+  // If the tab is already active (rare), load it
+  if (document.getElementById('securityLock')?.classList.contains('active')) {
+    loadPortalStatus();
+  }
+});
+
+// Optional: refresh when the page becomes visible again (e.g., after switching tabs)
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden && document.getElementById('securityLock')?.classList.contains('active')) {
+    loadPortalStatus();
+  }
+});
+
+// ============================
+// UTILITIES
+// ============================
+function logActivity(type, description) {
+  fetch('/api/log-activity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, description, status: 'Success' })
+  }).catch(err => console.warn('Activity log failed', err));
+}
+
+function showNotification(message, type = 'info') {
+  const colors = { success: '#2ecc71', error: '#e74c3c', info: '#3498db', warning: '#f39c12' };
+  const notification = document.createElement('div');
+  notification.style.cssText = `position:fixed; top:20px; right:20px; background:${colors[type]}; color:white; padding:15px 25px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.2); z-index:2000; animation:slideIn 0.3s ease; font-weight:600;`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  }
+}
+
+// ============================
+// INITIALISATION – RELOAD ON TAB CLICK
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (confirmBtn) confirmBtn.addEventListener('click', confirmLockChange);
+
+  const securityTab = document.querySelector('a[data-tab="securityLock"]');
+  if (securityTab) {
+    securityTab.removeEventListener('click', loadPortalStatus);
+    securityTab.addEventListener('click', function() {
+      loadPortalStatus();
+    });
+  }
+
+  if (document.getElementById('securityLock')?.classList.contains('active')) {
+    loadPortalStatus();
+  }
+});
+
+// ============================
+// UTILITIES
+// ============================
+function logActivity(type, description) {
+  fetch('/api/log-activity', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type, description, status: 'Success' })
+  }).catch(err => console.warn('Activity log failed', err));
+}
+
+function showNotification(message, type = 'info') {
+  const colors = { success: '#2ecc71', error: '#e74c3c', info: '#3498db', warning: '#f39c12' };
+  const notification = document.createElement('div');
+  notification.style.cssText = `position:fixed; top:20px; right:20px; background:${colors[type]}; color:white; padding:15px 25px; border-radius:10px; box-shadow:0 5px 20px rgba(0,0,0,0.2); z-index:2000; animation:slideIn 0.3s ease; font-weight:600;`;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => notification.remove(), 3000);
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('active');
+  }
+}
+
+// ============================
+// INITIALISATION – RELOAD ON TAB CLICK
+// ============================
+document.addEventListener('DOMContentLoaded', function() {
+  const confirmBtn = document.getElementById('confirmLockBtn');
+  if (confirmBtn) confirmBtn.addEventListener('click', confirmLockChange);
+
+  const securityTab = document.querySelector('a[data-tab="securityLock"]');
+  if (securityTab) {
+    // Remove any previous listener to avoid double calls
+    securityTab.removeEventListener('click', loadPortalStatus);
+    securityTab.addEventListener('click', function() {
+      loadPortalStatus();
+    });
+  }
+
+  // If the security lock tab is active on page load (rare), load it
+  if (document.getElementById('securityLock')?.classList.contains('active')) {
+    loadPortalStatus();
+  }
+});
 
 // ============================
 // UTILITIES

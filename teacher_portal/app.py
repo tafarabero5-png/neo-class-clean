@@ -3983,7 +3983,6 @@ def delete_event(event_id):
 # ============================
 # SECURITY LOCK API (OPTIMISED)
 # ============================
-
 @app.route('/api/portal-status', methods=['GET'])
 def get_portal_status():
     if 'admin' not in session:
@@ -3991,7 +3990,6 @@ def get_portal_status():
     try:
         conn = get_database()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        # Fetch both portals in one query – already efficient
         cursor.execute("SELECT portal, is_locked, last_changed FROM portal_status")
         rows = cursor.fetchall()
         cursor.close()
@@ -4004,7 +4002,13 @@ def get_portal_status():
             elif row['portal'] == 'student':
                 status['student_locked'] = row['is_locked']
                 status['student_last_change'] = row['last_changed'].strftime('%Y-%m-%d %H:%M:%S')
-        return jsonify(status)
+        # Add this print to see in terminal when the endpoint is called
+        print(f"🔒 Portal status requested: teacher_locked={status['teacher_locked']}, student_locked={status['student_locked']}")
+        response = jsonify(status)
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['Expires'] = '0'
+        return response
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -4022,7 +4026,6 @@ def update_portal_status():
     try:
         conn = get_database()
         cursor = conn.cursor()
-        # Use a single transaction (already implied)
         cursor.execute("""
             INSERT INTO portal_status (portal, is_locked, last_changed, changed_by)
             VALUES (%s, %s, NOW(), %s)
@@ -4050,7 +4053,6 @@ def lock_history():
     try:
         conn = get_database()
         cursor = conn.cursor(cursor_factory=psycopg2.extras.DictCursor)
-        # Limit to last 50 records for speed (adjust as needed)
         cursor.execute("""
             SELECT portal, action, reason, performed_by, timestamp
             FROM lock_history
@@ -4060,10 +4062,11 @@ def lock_history():
         history = cursor.fetchall()
         cursor.close()
         conn.close()
-        return jsonify({'history': [dict(h) for h in history]})
+        response = jsonify({'history': [dict(h) for h in history]})
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return response
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
 # ============================
 # ACTIVITY LOG API
 # ============================
